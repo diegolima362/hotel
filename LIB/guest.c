@@ -22,6 +22,7 @@ void criar_contrato(){
 				break;
 			}
 			case  3:{
+				listar_srvc();
 				break;
 			}
 			case  -1: hold = 0; break;

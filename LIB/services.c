@@ -5,6 +5,8 @@ void listar_srvc(){
 		mostrar_srvc(srvcs[i]);
 	}
 
+	getchar(); 
+
 }
 
 void mostrar_srvc(SERVICE srvc){

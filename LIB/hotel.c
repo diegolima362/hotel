@@ -91,7 +91,9 @@ void inic(){
 	
 	ler_qrts();
 	fechar_qrts();
-	
+
+	criar_services();
+
 	limpar_tela();
 	menu_principal();
 }
