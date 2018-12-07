@@ -76,14 +76,20 @@ typedef struct carro{
 }CAR;
 
 typedef struct contrato{
+	
 	double id;
+	
 	bool status;
 	int dias_reserva;
 	int dias_alt_tmp;
+	
 	CLIENTE cliente;
 	TEMPO res;
 	QUARTO qrt;
 	RESERVAS r;
+	
+	float fatura;
 	char fat[31];
 	int num;
+
 }CONTRATO;

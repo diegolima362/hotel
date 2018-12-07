@@ -28,6 +28,7 @@ void mostrar_texto(int n){
 			printf("\t\t    (3) FINALIZAR RESERVA DE UM HOSPEDE\n");
 			printf("\t\t      (4) BUSCAS\n");
 			printf("\t\t        (5) LISTA DE HOSPEDES\n");
+			printf("\t\t          (6) ADICIONAR SERVICOS A UM CONTRATO\n");
 			printf("\n\t\t(X) VOLTAR\n");
 			printf("\n\t\tOPÇÃO: ");
 			break;
@@ -47,7 +48,7 @@ void mostrar_texto(int n){
 			printf("\n\tNOVOS HOSPEDE\n\n");
 			printf("\t\t(1) REGISTRAR NOVO HOSPEDE\n");
 			printf("\t\t  (2) VER LISTA DE QUARTOS DISPONIVEIS\n");
-			printf("\t\t    (3) SERVICOS ADICIONAIS\n");
+			printf("\t\t    (3) ADICIONAR SERVICO AO CONTRATO\n");
 			printf("\n\t\t(X) VOLTAR\n");
 			printf("\n\t\tOPÇÃO: ");
 			break;			
@@ -72,11 +73,11 @@ void mostrar_texto(int n){
 			break;
 		}
 		case 10:{
-			printf("\t>>> LENDO ARQUIVOS ....\n\n");
-			printf("\t>>> ARQUIVOS CARREGADOS ....\n");
-			printf("\n\n!!! PARA EVITAR PERDAS DE DADOS IMPORTANTES, NAO DESLIGUE O COMPUTADOR ANTES DE");
-			printf("\n\n\t\tSAIR DO PROGRAMA OU O FECHE REPENTINAMENTE !!!\n\n");
-			printf("\n\n>>> PRESSIONE <ENTER> PARA CONTINUAR ");
+			printf("\n\t\t>>> LENDO ARQUIVOS ....\n\n");
+			printf("\n\t\t>>> ARQUIVOS CARREGADOS ....\n");
+			printf("\n\n\t!!! PARA EVITAR PERDAS DE DADOS IMPORTANTES, NAO DESLIGUE O COMPUTADOR ANTES DE");
+			printf("\n\n\t\t   SAIR DO PROGRAMA OU O FECHE REPENTINAMENTE !!!\n\n");
+			printf("\n\n\t\t>>> PRESSIONE <ENTER> PARA CONTINUAR ");
 			getchar();
 			break;
 		}
@@ -119,6 +120,7 @@ void mostrar_texto(int n){
 			printf("\n\t\t  (5) EXECUTIVO SIMPLES");
 			printf("\n\t\t (6) EXECUTIVO DUPLO");
 			printf("\n\t\t(7) EXECUTIVO TRIPLO\n");
+			printf("\n\t\t(0) VOLTAR\n");
 			printf("\n\t\tOPÇÃO: ");
 			break;
 		}

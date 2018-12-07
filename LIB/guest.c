@@ -22,7 +22,7 @@ void criar_contrato(){
 				break;
 			}
 			case  3:{
-				listar_srvc();
+				contratar_srvc(); 
 				break;
 			}
 			case  -1: hold = 0; break;
@@ -39,13 +39,18 @@ void inserir_contrato(){
 	
 	ler_arquivos();
 	ler_qrts();
+
+	int res = reservar_qrt(&p, &r);
 	
-	if(reservar_qrt(&p, &r) == 0){
-		printf("\n\t\tNAO HA QUARTOS DISPONIVEIS PARA ESSA DATA\n");
-		getchar(); getchar();
+	if(res == -1)
+		return;
+	
+	if(res == 0){		
+		printf("\n\t\tNAO HA QUARTOS DISPONIVEIS PARA ESSA DATA \n\t\tOU PERIOSO DE RESERVA INVALIDO\n");
+		pausa();
 		return;
 	}
-	
+
 	ler_cliente(&p.cliente);
 	
 	p.id = p.cliente.id;
@@ -57,6 +62,8 @@ void inserir_contrato(){
 	r.status = true;
 
 	p.r = r;
+
+	alocar_qrt(r.num, &p.qrt);
 
 	criar_fatura(p.fat, p.id);
 
@@ -221,7 +228,7 @@ void remover_contrato(double n){
 			mostrar_cliente(reg);
 		}
 	}
-	getchar(); getchar();
+	pausa();
 
 	remove(DB);
 	system("cp DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS_TMP.DAT DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS.DAT");

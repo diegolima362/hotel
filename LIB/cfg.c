@@ -31,6 +31,11 @@ void limpar_dados(){
 		remove(L_QRTS);
 		remove(INF);
 		remove(L_INF);
+
+		system("rm -rf FATURAS/");
+		system("mkdir FATURAS/");
+		system("mkdir FATURAS/ABERTAS/");
+
 		limpar_tela();
 		puts("\n\t\tTODOS OS DADOS FORAM REMOVIDOS!!!\n\t\t\n");
 		getchar();

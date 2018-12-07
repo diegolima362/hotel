@@ -2,7 +2,10 @@
 #include "includes.h"
 
 void sair(int n){
-	printf("SAINDO ...\n");
+	limpar_tela();
+	mostrar_texto(25);
+	putchar('\n');
+	printf("\t\t\tSAINDO ...\n\n");
 	exit(n);
 }
 
@@ -43,6 +46,7 @@ void menu_hospedagem(){
 			case 3  : remover_contrato(0); break;
 			case 4  : menu_pesquisa(database); break;
 			case 5  : listar_clientes(); break;
+			case 6  : contratar_srvc(); break;
 			
 			case -1 : hold = 0; break;
 			default : tipo_de_erro(1);   break;

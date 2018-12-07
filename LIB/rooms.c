@@ -59,6 +59,7 @@ void mostrar_qrts_restrict(QUARTO q){
 
 void checar_vagas(){
 	TEMPO dat;
+	QUARTO qrt;
 		
 	int qrt_tip;
 	int num;
@@ -92,7 +93,12 @@ int reservar_qrt(CONTRATO *p, RESERVAS *r){
 	
 	qrt_tip = escolher_tip();
 
+	if(qrt_tip == 0)
+		return -1;
+	
+	limpar_teclado();
 	limpar_tela();
+
 	printf("\n\n\t\t\tDATA DE ENTRADA\n");
 		if(!pegar_dat(&dat.ini))
 			return 0;
@@ -124,22 +130,29 @@ int escolher_tip(){
 	mostrar_texto(14);
 
 	do{		
-		limpar_teclado();
-		
-		l = opc();
-		
-		if(l<1||l>7){
-			printf("\nOPCAO INVALIDA!!!\n");
-		}
-		else{
-			break;
-		}
+		scanf(" %d", &l);
 
+		if(l == 0)
+			return 0;
+		
+		if(l>=1||l<=7)
+			return l;
+	
 	}while(1);
-
-	return l;
 }
 
+
+void alocar_qrt(int num, QUARTO* qrt){
+	QUARTO q;
+	
+	ler_qrts();
+	while(fread(&q, sizeof(QUARTO), 1, rooms)){
+		if(q.num == num){
+			*qrt = q;
+			return;
+		}
+	}
+}
 
 int select_qrt(int tipo, int  *v, int m){
 	limpar_tela();
@@ -154,10 +167,12 @@ int select_qrt(int tipo, int  *v, int m){
 		do{
 			printf("\n\t\t\tNUMERO DO QUARTO SELECIONADO: ");
 			l=opc();
-			if(test_num(tipo, l, v, m))
+			if(test_num(tipo, l, v, m)){
 				return l;
-			else
+			}
+			else{
 				printf("\n\t\tOPCAO INVALIDA!!!\n");
+			}
 		} while (1);		
 	}
 }

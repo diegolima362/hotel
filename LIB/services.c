@@ -17,6 +17,56 @@ void mostrar_srvc(SERVICE srvc){
 	printf("\t\t--------------------------------------------------------------------\n");
 }
 
+void contratar_srvc(){
+	
+	CONTRATO p;
+	
+	double c_id;
+	int i = 0;
+	int qtd;
+
+	limpar_tela();
+	listar_clientes();
+	printf("\n\tDIGITE O ID DO CLIENTE: ");
+	scanf("%lf", &c_id);
+
+	ler_arquivos();
+	while(fread(&p, sizeof(p),1,database)){		
+		if(p.id == c_id){
+			i=1;
+			break;
+		}					
+	}
+
+	if(i==0){
+		printf("\n\tID INVALIDO!\n");
+		pausa();
+		return;
+	}
+
+	limpar_tela();
+	listar_srvc();
+
+	int id;
+	puts("\t<ENTER>"); getchar();
+	
+	printf("\n\t\tDIGITE O ID DO SERIVICO: "); limpar_teclado();
+	scanf(" %d", &id);
+
+	if(id < 1 || id > 5){
+		printf("\n\t\tCODIGO DE SERIVICO INVALIDO!\n");
+		return;
+	}
+
+	printf("\n\t\tQUANTIDADE DE HORAS / DIARIAS : "); limpar_teclado();
+	scanf("%d", &qtd);
+	printf("\n\t\tVALOR ADICIONAL (ALTA TEMPORADA)? (1) SIM (0) NAO : ");
+	scanf("%d", &i);
+	pegar_dat(&srvcs[id-1].data);
+
+	adicionar_valor_fatura(srvcs[id-1], qtd, i , p.fat);
+}
+
 void criar_services(){
 			
 	strcpy(srvcs[0].nome, "CARRO DE LUXO");

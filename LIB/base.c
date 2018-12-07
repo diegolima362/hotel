@@ -67,10 +67,10 @@ void tipo_de_erro(int n){
 }
 
 int opc(){
-	char op[10];
+	char op[5];
 	int l;
 	limpar_teclado();
-	fgets(op, 10, stdin); upper(op); if ( op[0] == 'X' ) { return -1; }
+	fgets(op, 5, stdin); upper(op); if ( op[0] == 'X' ) { return -1; }
 	l=atoi(op);
 	return l;
 }
@@ -84,6 +84,9 @@ int confirmar(){
 	return 0;
 }
 
+void pausa(){
+	getchar(); getchar();
+}
 
 void test_fun(char c){
 	printf("\nTESTE %c\n", c);
@@ -94,7 +97,7 @@ void formatar_cpf(char *cpf_formatado){
 	int icpf[11];
 	int i = 0;
 	
-	printf("INSIRA O CPF (SOMENTE NUMEROS): ");
+	printf("\t\tINSIRA O CPF (SOMENTE NUMEROS): ");
 	limpar_teclado();
 	
 	fgets(scpf,19,stdin); limpar_teclado();
@@ -113,4 +116,12 @@ void formatar_cpf(char *cpf_formatado){
 	for(i=8;  i<11;i++) {	cpf_formatado[i] = scpf[i-2];		}
 	for(i=12; i<15;i++) {	cpf_formatado[i] = scpf[i-3];		}
 	remover_quebra(cpf_formatado);
+}
+
+void medir_tela(){
+	limpar_tela();
+	puts(" _\t\t\t\t\t\t\t\t\t\t\t\t\t _");
+	puts("|\t\t\t\t\t\t\t\t\t\t\t\t\t  |");
+	puts("\n\n\n\n\n\n\n\n\n\n\t\t\t\t\tMODIFIQUE A JANELA ATE\n\t\t\t\t\t SE ADQUAR AS MARGENS\n\n\n\n\n\n\n\n\n\n\n\n");
+	puts("|_\t\t\t\t\t\t\t\t\t\t\t\t\t _|\n");
 }

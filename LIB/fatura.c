@@ -30,21 +30,25 @@ void criar_fatura(char *fat, double pid){
 	fclose(fatura);
 }
 
-void adicionar_valor_fatura(SERVICE srv, char *fat){
+void adicionar_valor_fatura(SERVICE srv, int qtd, int alt, char *fat){
+	
 	FILE *fatura;
-
 	fatura = fopen(fat, "r+b");
 	
+	int i;
+
 	if(fatura == NULL){
 		printf("\n\t\tERRO AO ENCONTRAR FATURA\n");
 		return;
 	}
 
-	fseek(fatura, 0L, SEEK_END);
-
-	fwrite(&srv, sizeof(srv),1, fatura);
+	for(i=0; i<qtd; i++){
+		fseek(fatura, 0L, SEEK_END);
+		fwrite(&srv, sizeof(srv),1, fatura);
+	}
 
 	fclose(fatura);
+
 }
 
 void fechar_fatura(CONTRATO *p){
@@ -52,11 +56,20 @@ void fechar_fatura(CONTRATO *p){
 	FILE *fatura;
 	float vlr = 0;
 
+	vlr += (p->dias_reserva - p->dias_alt_tmp) * p->qrt.vlr_nrm;
+	vlr += p->dias_alt_tmp * p->qrt.vlr_nrm;
+
 	fatura = fopen(p->fat, "r+b");
 
 	while(fread(&srv, sizeof(SERVICE), 1, fatura)){
-		vlr += srv.prc_norm * srv.prc_alta;
+		printf("SERIVICO: %s\n", srv.nome);
+		printf("DATA: "); mostrar_dat(srv.data);putchar('\n');
+		vlr += srv.prc_norm;
 	}
+
+	printf("VALOR: R$ %.2f\n", vlr); pausa();
+	p->fatura = vlr;
+	pausa();
 
 	remove(p->fat);
 }

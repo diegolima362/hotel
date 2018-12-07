@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include<sys/types.h>
+#include<sys/stat.h>
 
 #include "elements.h"
 #include "globals.h"
