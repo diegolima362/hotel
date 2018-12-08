@@ -121,7 +121,7 @@ void formatar_cpf(char *cpf_formatado){
 void load(){
 	int i;
 
-	printf("\n\n\t\t\t\t\t\t\t\tCARRAGANDO ...\n\n\t\t\t\t");
+	printf("\n\n\t\t\t\t\t\t\t\tCARREGANDO ...\n\n\t\t\t\t");
 	/*for(i=0;i<30;i++){
 		printf("||");
 		fflush(stdout);
