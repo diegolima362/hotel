@@ -1,0 +1,2 @@
+ 
+info com o numero de clintes adicionado em cada execucao

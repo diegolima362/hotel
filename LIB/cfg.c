@@ -30,7 +30,7 @@ void limpar_dados(){
 			fflush(stdout);
 			usleep(30000);
 		}
-
+		system("rm -rf FATURAS/");
 		remove(DB);
 		remove(DB_TMP);
 		remove(L_DB);
@@ -42,9 +42,14 @@ void limpar_dados(){
 		remove(INF);
 		remove(L_INF);
 
-		system("rm -rf FATURAS/");
+		
 		system("mkdir FATURAS/");
 		system("mkdir FATURAS/ABERTAS/");
+		pausa();
+
+		FILE*fp = fopen("FATURAS/info.txt", "w+");
+		fprintf(fp, "PASTA COM DADOS SOBRE AS COBRANCAS DE CADA HOSPEDE.\n");
+		fclose(fp);
 
 		remove("DATABASE/.1515841051");
 
