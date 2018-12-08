@@ -21,6 +21,16 @@ void alterar_senha(){
 void limpar_dados(){
 	limpar_tela();
 	if(alt_log()==1){
+
+		int i;
+		limpar_tela();
+		printf("\n\t\t\tAPAGANDO OS DADOS...\n\t\t\t");
+		for(i=0;i<100;i++){
+			printf("/");
+			fflush(stdout);
+			usleep(30000);
+		}
+
 		remove(DB);
 		remove(DB_TMP);
 		remove(L_DB);
@@ -35,6 +45,8 @@ void limpar_dados(){
 		system("rm -rf FATURAS/");
 		system("mkdir FATURAS/");
 		system("mkdir FATURAS/ABERTAS/");
+
+		remove("DATABASE/.1515841051");
 
 		limpar_tela();
 		puts("\n\t\tTODOS OS DADOS FORAM REMOVIDOS!!!\n\t\t\n");

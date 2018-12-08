@@ -38,12 +38,12 @@ void contratar_srvc(){
 
 	if(op == 1){
 		listar_clientes();
-		printf("\n\tDIGITE O ID DO CLIENTE: ");
+		printf("\n\n\tDIGITE O ID DO CLIENTE: ");
 		scanf("%lf", &c_id);
 	}
 
 	if(op == 2){
-		printf("\n\tDIGITE O ID DO CLIENTE: ");
+		printf("\n\n\tDIGITE O ID DO CLIENTE: ");
 		scanf("%lf", &c_id);
 	}
 

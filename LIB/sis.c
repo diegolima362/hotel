@@ -15,7 +15,7 @@ void menu_inf_sis(){
 			case 1:{
 				limpar_tela();
 				int qtd = contar_clientes();
-				printf("\nCLIENTES HOSPEDADOS: %d\n", qtd);
+				printf("\n\n\t\tCLIENTES HOSPEDADOS: %d\n", qtd);
 				getchar();
 				break;
 			}
@@ -52,7 +52,7 @@ void reservas_ativas(){
 	ler_qrts();
 	
 	while(fread(&res, sizeof(RESERVAS), 1, l_rooms)){
-		printf("\nNUM %d\n", res.num);
+		printf("\n\t\tQUARTO %d RESERVA ", res.num);
 		mostrar_dat(res.res.ini); printf(" - "); mostrar_dat(res.res.fim);  puts("\n");
 	}
 }
@@ -66,7 +66,7 @@ void list_inat(){
 		limpar_tela();
 		puts("\n\tHISTORICO DE CLIENTES HOSPEDADOS\n\n");
 		printf("\t\t\t\tPAGINA 1\n\n");
-		puts("\t|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
+		puts("\t------------------------------------------------------------------------\n");
 		
 		CONTRATO reg;
 		rewind(database);

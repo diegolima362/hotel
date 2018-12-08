@@ -118,10 +118,20 @@ void formatar_cpf(char *cpf_formatado){
 	remover_quebra(cpf_formatado);
 }
 
-void medir_tela(){
-	limpar_tela();
-	puts(" _\t\t\t\t\t\t\t\t\t\t\t\t\t _");
-	puts("|\t\t\t\t\t\t\t\t\t\t\t\t\t  |");
-	puts("\n\n\n\n\n\n\n\n\n\n\t\t\t\t\tMODIFIQUE A JANELA ATE\n\t\t\t\t\t SE ADQUAR AS MARGENS\n\n\n\n\n\n\n\n\n\n\n\n");
-	puts("|_\t\t\t\t\t\t\t\t\t\t\t\t\t _|\n");
+void load(){
+	int i;
+
+	printf("\n\n\t\t\t\t\t\t\t\tCARRAGANDO ...\n\n\t\t\t\t");
+	/*for(i=0;i<30;i++){
+		printf("||");
+		fflush(stdout);
+		usleep(50000);
+	}*/
+
+	for(i=0;i<100;i++){
+		printf("/");
+		fflush(stdout);
+		usleep(30000);
+	}
+
 }

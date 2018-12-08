@@ -115,7 +115,7 @@ void alterar_contrato(double n){
 
 	printf("\n\tDADOS DO HOSPEDE\n\n");
 	mostrar_cliente(reg);
-	printf("\n\nEDITAR A RESERVA (S/N)? "); limpar_teclado(); 
+	printf("\n\n\t\tEDITAR A RESERVA (S/N)? "); limpar_teclado(); 
 	
 	scanf("%s", op); upper(op);
 
@@ -176,7 +176,7 @@ void remover_contrato(double n){
 
 	printf("\n\tDADOS DO HOSPEDE\n\n");
 	mostrar_cliente(reg);
-	printf("\n\nFINALIZAR A RESERVA (S/N)? "); limpar_teclado(); 
+	printf("\n\n\t\tFINALIZAR A RESERVA (S/N)? "); limpar_teclado(); 
 	
 	scanf("%s", op); upper(op);
 
@@ -264,7 +264,7 @@ void mostrar_reserva(CONTRATO p){
 	printf("\t\t  CPF: %s\n", p.cliente.cpf);
 	printf("\t\t   QUARTO: %d\n\n", p.r.num);
 	printf("\t\t    RESERVA: "); mostrar_dat(p.res.ini); printf(" - "); mostrar_dat(p.res.fim); putchar('\n');
-	puts("\t|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
+	puts("\t-----------------------------------------------------------------------------------\n");
 }
 
 
@@ -375,7 +375,7 @@ void ler_cliente(CLIENTE *p){
 	double id = gerar_id();
 
 	limpar_tela();
-	printf("\n\t\t\t-------- ADICIONAR DADOS DO CLIENTE --------\n\n");
+	printf("\n\n\t\t\t-------- ADICIONAR DADOS DO CLIENTE --------\n\n");
 
 	printf("\n\t\tID: %.lf\n", id); p->id = id;
 	printf("\n\t\tNOME DO CLIENTE: "); limpar_teclado();
@@ -422,7 +422,7 @@ void listar_clientes(){
 	do{
 		mostrar_texto(7);
 		printf("\t\t\t\tPAGINA 1\n\n");
-		puts("\t|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
+		puts("\t------------------------------------------------------------------------\n");
 		
 		CONTRATO reg;
 		rewind(database);
@@ -468,7 +468,7 @@ void mostrar_cliente(CONTRATO p){
 	printf("\t\t%s, %d, %s\n", p.cliente.end.bairro, p.cliente.end.num, p.cliente.end.rua);
 	printf("\t\t%s - %s - %s\n", p.cliente.end.cidade, p.cliente.end.estado, p.cliente.end.pais);
 	
-	puts("\t|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
+	puts("\t--------------------------------------------------------------------------------------------------------\n");
 	
 }
 
@@ -510,13 +510,13 @@ double menu_remove(){
 	switch(l){
 		case 1:{
 			listar_clientes();
-			printf("\n\nDIGITE O ID PARA FAZER CHECK-OUT: ");
+			printf("\n\n\t\tDIGITE O ID PARA FAZER CHECK-OUT: ");
 			scanf("%lf", &id);
 			remover_contrato(id);
 			break;
 		}
 		case 2:{
-			printf("\nDIGITE O ID: ");
+			printf("\n\t\tDIGITE O ID: ");
 			scanf("%lf", &id);
 			return id;
 			break;
@@ -538,13 +538,13 @@ double menu_edita(){
 	switch(l){
 		case 1:{
 			listar_clientes();
-			printf("\n\nDIGITE O ID PARA EDITAR HOSPEDE: "); limpar_teclado();
+			printf("\n\n\t\tDIGITE O ID PARA EDITAR HOSPEDE: "); limpar_teclado();
 			scanf("%lf", &id);
 			alterar_contrato(id);
 			break;
 		}
 		case 2:{
-			printf("\nDIGITE O ID: "); limpar_teclado();
+			printf("\n\t\tDIGITE O ID: "); limpar_teclado();
 			scanf("%lf", &id);
 			return id;
 			break;
@@ -571,14 +571,13 @@ double gerar_id(){
 	id += ti->tm_min * 100;
 	id += ti->tm_sec;
 
-	printf("\nid %.lf\n", id);
 	return id;
 }
 
 
 int pagina(int *j){ 
 	int l;
-	printf("\n>>> PRESSIONE <ENTER> PARA MOSTRAR  A PROXIMA PAGINA OU X PARA SAIR: ");
+	printf("\n\t\t>>> PRESSIONE <ENTER> PARA MOSTRAR  A PROXIMA PAGINA OU X PARA SAIR: ");
 	*j = *j+1;
 	l = opc();
 	limpar_tela();

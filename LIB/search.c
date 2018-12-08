@@ -6,8 +6,8 @@ void sair_pesquisa(int n){
 	if(n > 1)
 		c = 'S';
 
-	printf("\n>>> %d RESULTADO%c\n", n, c);
-	printf("\n\t\t(1) EDITAR RESERVA (2) FINALIZAR RESERVA\n"); 
+	printf("\n\t\t>>> %d RESULTADO%c ENCONTRADO%c\n", n, c, c);
+	printf("\n\n\t\t(1) EDITAR RESERVA (2) FINALIZAR RESERVA\n"); 
 	printf("\n\t\t<ENTER> PESQUISAR NOVAMENTE (X) VOLTAR\n\n\t\tOPCAO: "); 
 }
 
@@ -15,8 +15,8 @@ int erro_pesquisa(){
 
 	char s[2];
 
-	printf("\n\nNÂO FORAM ENCONTRADOS HOSPEDES PARA O TERMO PESQUISADO !!!\n\n\n");getchar();
-	printf("PESQUISAR NOVAMENTE? (S) (N) : "); limpar_teclado(); limpar_teclado();
+	printf("\n\n\t\tNÂO FORAM ENCONTRADOS HOSPEDES PARA O TERMO PESQUISADO !!!\n\n\n");getchar();
+	printf("\t\tPESQUISAR NOVAMENTE? (S) (N) : "); limpar_teclado(); limpar_teclado();
 	
 	scanf("%s", s); upper(s);
 
@@ -48,7 +48,7 @@ int analisa(int n){
 		return 0;
 
 	if(l==1){
-		printf("\nINSIRA ID: ");
+		printf("\n\t\tINSIRA ID: ");
 		double op;
 		limpar_teclado();
 		scanf("%lf", &op);
@@ -57,7 +57,7 @@ int analisa(int n){
 	}
 
 	if(l==2){
-		printf("\nINSIRA ID: ");
+		printf("\n\t\tINSIRA ID: ");
 		double op;
 		limpar_teclado();
 		scanf("%lf", &op);
@@ -69,7 +69,7 @@ int analisa(int n){
 }
 
 void pesquisar_cliente_nome(){
-	int j = 1, l, i;
+	int j = 1, l, i = 1;
 	char nome[60];
 	int resultados = 0;
 	int hold = 1;
@@ -89,7 +89,7 @@ void pesquisar_cliente_nome(){
 		rewind(database);
 		limpar_tela();
 		mostrar_texto(0);
-		printf("\n\t\tRESULTADOS ENCONTRADOS PARA %s\n\n", nome);
+		printf("\n\n\n\t\tRESULTADOS ENCONTRADOS PARA %s\n\n", nome);
 		
 		while(fread(&p, sizeof(p),1,database)){
 			
@@ -114,25 +114,21 @@ void pesquisar_cliente_nome(){
 		nome[0]='\0';
 		
 		if(analisa(resultados) == 0){
-		
+			limpar_tela();
 			break;
-		
-		}else{
-			getchar();
-			limpar_teclado();
-			pesquisar_cliente_nome();
 		}
-
+		
 		resultados = 0;		
 
 	}while(hold);
 
+	limpar_tela();
 	fechar_arquivos();
 	tipo_de_erro(2);
 }
 
 void pesquisar_cliente_cpf(){
-	int j = 1, l, i;
+	int j = 1, l, i = 1;
 	char cpf[15];
 	int resultados = 0;
 	int hold = 1;
@@ -150,7 +146,7 @@ void pesquisar_cliente_cpf(){
 		rewind(database);
 		limpar_tela();
 		mostrar_texto(0);
-		printf("\n\t\tRESULTADOS ENCONTRADOS PARA %s\n\n", cpf);
+		printf("\n\n\n\t\tRESULTADOS ENCONTRADOS PARA %s\n\n", cpf);
 		
 		while(fread(&p, sizeof(p),1,database)){
 			
@@ -171,24 +167,22 @@ void pesquisar_cliente_cpf(){
 		}
 
 		if(analisa(resultados) == 0){
+			limpar_tela();
 			break;
-		}else{
-			getchar();
-			limpar_teclado();
-			pesquisar_cliente_cpf();
 		}
 
 		resultados = 0;		
 
 	}while(hold);
 
+	limpar_tela();
 	fechar_arquivos();
 	tipo_de_erro(2);
 }
 
 
 void pesquisar_cliente_id(){
-	int j = 1, l, i;
+	int j = 1, l, i = 1;
 	double id;
 	int resultados = 0;
 	int hold = 1;
@@ -207,7 +201,7 @@ void pesquisar_cliente_id(){
 		rewind(database);
 		limpar_tela();
 		mostrar_texto(0);
-		printf("\n\t\tRESULTADOS ENCONTRADOS PARA '%.lf'\n\n", id);
+		printf("\n\n\n\t\tRESULTADOS ENCONTRADOS PARA '%.lf'\n\n", id);
 
 		while(fread(&p, sizeof(p),1,database)){
 			if(p.status == true && p.id == id){
@@ -224,12 +218,17 @@ void pesquisar_cliente_id(){
 			}
 		}
 
-	if(analisa(resultados) == 0)
+	if(analisa(resultados) == 0){
+		limpar_teclado();
+		limpar_tela();
 		break;
+	}
 	
 	resultados = 0;		
 	
 	}while(hold);
+
+	limpar_tela();
 
 	fechar_arquivos();
 

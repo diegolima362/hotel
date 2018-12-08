@@ -2,18 +2,18 @@
 
 int create(PASS *PSS){
 	char op[2];
+	char *pass;
 
 	limpar_tela();
-	puts("\t\t\t\tCRIAR USUARIO ADMINISTRADOR\n");
-	puts("\t\t---------------------------------------------------");
-	printf("\t\tID: ");
+	puts("\n\n\n\t\t\t\tCRIAR USUARIO ADMINISTRADOR\n");
+	puts("\t\t-----------------------------------------------------------");
+	printf("\n\n\t\tID: ");
 	fgets(PSS->idntf, 32, stdin); remover_quebra(PSS->idntf);
-	puts("\t\t---------------------------------------------------");
-	printf("\t\tSENHA: ");
-	fgets(PSS->passw, 32, stdin); remover_quebra(PSS->passw);
-	puts("\t\t---------------------------------------------------");
-	printf("\n\t<ENTER> PARA CONTINUAR "); getchar();
-	printf("\n\t\tSALVAR '%s' : '%s' ? (S) ", PSS->idntf, PSS->passw); 
+	puts("\t\t-----------------------------------------------------------");
+	pass = getpass("\n\n\t\tSENHA: "); remover_quebra(pass); strcpy(PSS->passw, pass);
+	puts("\t\t-----------------------------------------------------------");
+	printf("\n\t\t<ENTER> PARA CONTINUAR"); getchar();
+	printf("\n\n\t\t\t\tSALVAR USUARIO: '%s' SENHA: '%s' ? (S) ", PSS->idntf, PSS->passw); 
 	limpar_teclado();
 	scanf("%s", op); upper(op);
 	
@@ -21,7 +21,7 @@ int create(PASS *PSS){
 		return 1;
 
 	getchar();
-	create(PSS);
+	return 0;
 }
 
 int gravar_pw(PASS *PSS){
@@ -37,10 +37,11 @@ int gravar_pw(PASS *PSS){
 
 int check(){
 	char usr[32];
-	char pssw[32];
+	char *pssw;
 	char adm[] = "2406";
 	
 	PASS reg;
+	pwd = fopen(PSSWD, "r+b");
 	fread(&reg,sizeof(PASS),1,pwd);
 
 	printf("\n\t\tLOGIN\n");
@@ -53,9 +54,9 @@ int check(){
 		login();
 	}
 
-	printf("\t\t\t    SENHA: "); limpar_teclado();	
-	fgets(pssw, 32, stdin); remover_quebra(pssw);
-
+	limpar_teclado();	
+	pssw = getpass("\t\t\t    SENHA: ");
+	
 	if(strcmp(reg.idntf, usr)==0 && strcmp(reg.passw, pssw)==0){
 		return 1;
 	}
@@ -66,9 +67,18 @@ int check(){
 }
 
 void login(){
+	
 	PASS PSS;
-
 	pwd = fopen(PSSWD, "r+b");
+
+	PASS reg;
+
+	if(pwd != NULL && fread(&reg,sizeof(PASS),1,pwd)!=1){
+		remove(PSSWD);
+		pwd = fopen(PSSWD, "r+b");
+	}
+
+	printf("%s %s\n", reg.idntf, reg.passw);
 
 	if(pwd == NULL){
 		pwd = fopen(PSSWD, "w+b");
@@ -95,4 +105,5 @@ void login(){
 		}
 		login();
 	}
+
 }

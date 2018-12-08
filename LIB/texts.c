@@ -11,6 +11,7 @@ void mostrar_texto(int n){
 			break;
 		}
 		case 1:{
+			limpar_tela();
 			mostrar_texto(0);
 			printf("\n\tMENU INICIAL\n");
 			printf("\n\t\t(1) HOSPEDAGEM\n");
@@ -76,7 +77,7 @@ void mostrar_texto(int n){
 			printf("\n\t\t>>> LENDO ARQUIVOS ....\n\n");
 			printf("\n\t\t>>> ARQUIVOS CARREGADOS ....\n");
 			printf("\n\n\t!!! PARA EVITAR PERDAS DE DADOS IMPORTANTES, NAO DESLIGUE O COMPUTADOR ANTES DE");
-			printf("\n\n\t\t   SAIR DO PROGRAMA OU O FECHE REPENTINAMENTE !!!\n\n");
+			printf("\n\n\t\t   SAIR DO PROGRAMA OU FECHE REPENTINAMENTE O PROGRAMA !!!\n\n");
 			printf("\n\n\t\t>>> PRESSIONE <ENTER> PARA CONTINUAR ");
 			getchar();
 			break;
@@ -125,32 +126,33 @@ void mostrar_texto(int n){
 			break;
 		}
 		case 25:{
-			puts("                  |\\==================\\\\                	    ");
-			puts("                  ||\\                  \\\\                  	");
-			puts("                  ||\\\\                  \\\\                 	");
-			puts("                  || \\\\                  \\\\                 	");
-			puts("                  ||  \\\\                  \\\\                	");
-			puts("                  ||   \\\\                  \\\\               	");
-			puts("                  ||    \\\\_ _ _ _ _ _ _ _ _ \\\\              	");
-			puts("                  ||     ||||              |||              		");
-			puts("                  ||     ||||  _   _   _   |||             		");
-			puts("                  ||     |||| |_| |_| |_|  |||             		");
-			puts("        ----------||     ||||  _   _   _   |||              		");
-			puts("         \\\\       ||     |||| |_| |_| |_|  |||             		");
-			puts("          \\\\      ||     ||||  _   _   _   |||              	");
-			puts("           \\\\     ||     |||| |_| |_| |_|  |||              	"); 
-			puts("            \\\\    ||     ||||  _   _   _   |||              	");
-			puts("             \\\\   ||     |||| |_| |_| |_|  |||              	");
-			puts("              \\\\  \\\\     ||||  _   _   _   |||\\             	");
-			puts("               \\\\  \\\\    |||| |_| |_| |_|  |||\\\\            ");
-			puts("                \\\\  \\\\   ||||              ||| \\\\  CAMPINA  ");
-			puts("                 \\\\  \\\\  ||||  __________  |||  \\\\  CONFORT ");
-			puts("                  \\\\  \\\\ |||| /__________\\ |||   \\\\  PREMIUM");
-			puts("                   \\\\  \\\\|||| || ||  || || |||    \\\\         ");
-			puts("                    \\\\  \\||||_|| ||__|| ||_|||     \\\\       	 ");
-			puts("                     \\\\=============================\\\\     	 ");
-			puts("                      \\\\=============================\\\\     	 ");
-			puts("                       \\\\=============================\\\\     \n");
+			puts("\n\n");
+			puts("\t\t                  |\\==================\\\\                	    ");
+			puts("\t\t                  ||\\                  \\\\                  	");
+			puts("\t\t                  ||\\\\                  \\\\                 	");
+			puts("\t\t                  || \\\\                  \\\\                 	");
+			puts("\t\t                  ||  \\\\                  \\\\                	");
+			puts("\t\t                  ||   \\\\                  \\\\               	");
+			puts("\t\t                  ||    \\\\_ _ _ _ _ _ _ _ _ \\\\              	");
+			puts("\t\t                  ||     ||||              |||              		");
+			puts("\t\t                  ||     ||||  _   _   _   |||             		");
+			puts("\t\t                  ||     |||| |_| |_| |_|  |||             		");
+			puts("\t\t        ----------||     ||||  _   _   _   |||              		");
+			puts("\t\t         \\\\       ||     |||| |_| |_| |_|  |||             		");
+			puts("\t\t          \\\\      ||     ||||  _   _   _   |||              	");
+			puts("\t\t           \\\\     ||     |||| |_| |_| |_|  |||              	"); 
+			puts("\t\t            \\\\    ||     ||||  _   _   _   |||              	");
+			puts("\t\t             \\\\   ||     |||| |_| |_| |_|  |||              	");
+			puts("\t\t              \\\\  \\\\     ||||  _   _   _   |||\\             	");
+			puts("\t\t               \\\\  \\\\    |||| |_| |_| |_|  |||\\\\            ");
+			puts("\t\t                \\\\  \\\\   ||||              ||| \\\\  CAMPINA  ");
+			puts("\t\t                 \\\\  \\\\  ||||  __________  |||  \\\\  CONFORT ");
+			puts("\t\t                  \\\\  \\\\ |||| /__________\\ |||   \\\\  PREMIUM");
+			puts("\t\t                   \\\\  \\\\|||| || ||  || || |||    \\\\         ");
+			puts("\t\t                    \\\\  \\||||_|| ||__|| ||_|||     \\\\       	 ");
+			puts("\t\t                     \\\\=============================\\\\     	 ");
+			puts("\t\t                      \\\\=============================\\\\     	 ");
+			puts("\t\t                       \\\\=============================\\\\     \n\n");
 		}
 	}
 }

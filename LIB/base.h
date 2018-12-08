@@ -9,4 +9,4 @@ void formatar_cpf(char *cpf_formatado);
 int confirmar();
 void test_fun(char c);
 void pausa();
-void medir_tela();
+void load();
