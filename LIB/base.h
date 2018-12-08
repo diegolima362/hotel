@@ -1,3 +1,4 @@
+void dir();
 int  opc();
 void limpar_tela();
 void upper(char *str);

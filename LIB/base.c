@@ -1,6 +1,17 @@
 // FUNCOES DE SISTEMA
 #include "includes.h"
 
+void dir(){
+	
+	system("mkdir DATABASE/");
+	system("mkdir DATABASE/CONTRATOS");	
+	system("mkdir DATABASE/CONTRATOS/ABERTOS");
+	system("mkdir DATABASE/CONTRATOS/FECHADOS");
+	system("mkdir LOG/");	
+	system("mkdir DATABASE/BKP");		
+	system("mkdir DATABASE/QUARTOS");
+}
+
 void upper(char *str){
 	while(*str){
 		*str=toupper(*str);
