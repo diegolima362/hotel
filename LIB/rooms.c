@@ -66,6 +66,9 @@ void checar_vagas(){
 	
 	qrt_tip = escolher_tip();
 
+	if(qrt_tip == 0)
+		return;
+
 	limpar_tela();
 	printf("\n\n\t\t\tDATA DE ENTRADA\n");
 		if(!pegar_dat(&dat.ini))
@@ -135,8 +138,14 @@ int escolher_tip(){
 		if(l == 0)
 			return 0;
 		
-		if(l>=1||l<=7)
+		if(l>=1&&l<=7){
 			return l;
+			break;
+		}
+		else{
+			return 0;
+			break;
+		}
 	
 	}while(1);
 }

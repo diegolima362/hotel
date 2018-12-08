@@ -1,6 +1,10 @@
 #include "includes.h"
 
 void menu_inf_sis(){
+	
+	if(alt_log() == 0)
+		return;
+
 	int op;
 	do{
 		limpar_tela();
@@ -10,7 +14,8 @@ void menu_inf_sis(){
 		switch(op){
 			case 1:{
 				limpar_tela();
-				printf("\nCLIENTES HOSPEDADOS: %d\n", 0);
+				int qtd = contar_clientes();
+				printf("\nCLIENTES HOSPEDADOS: %d\n", qtd);
 				getchar();
 				break;
 			}
@@ -53,7 +58,7 @@ void reservas_ativas(){
 }
 
 void list_inat(){
-	
+	ler_arquivos();
 	int hold = 1;
 	int i, j=1, l, hold2 = 1;
 	

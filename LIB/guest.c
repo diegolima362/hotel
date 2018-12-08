@@ -79,12 +79,6 @@ void inserir_contrato(){
 
 
 void alterar_contrato(double n){
-	
-	if(contar_clientes() == 0){
-		printf("\n\t\tNAO EXISTEM RESERVAS ATIVAS\n");
-		getchar();
-		return;
-	}
 
 	ler_arquivos();
 
@@ -96,7 +90,7 @@ void alterar_contrato(double n){
 
 	CONTRATO reg;
 	double id = n;
-	int x = 0;
+	bool x = false;
 	char op[2];
 
 	if(n == 0)
@@ -106,12 +100,12 @@ void alterar_contrato(double n){
 
 	while(fread(&reg,sizeof(CONTRATO),1,database)){
 		if(reg.id == id && reg.status){
-			x++;
+			x=true;
 			break;
 		}
 	}
 
-	if(x==0){
+	if(!x){
 		puts("ID INEXISTENTE OU PROBLEMAS NO POSICIONAMENTO!!!\n");
 		tipo_de_erro(2);
 		return;
@@ -197,22 +191,7 @@ void remover_contrato(double n){
 	
 	fechar_fatura(&reg);
 	
-	limpar_tela();
-	printf("\n\tRESERVA FINALIZADA !\n");
-	printf("\n\tFATURA SALVA NA PASTA 'FATURAS'\n");
-	printf("\n\tMOSTRAR FATURA (S/N)? ");
-	limpar_teclado();
-	scanf("%s", op); upper(op);
-
-	if(op[0] == 'S'){
-		limpar_tela();
-		mostrar_fatura(reg);
-		printf("\n\t\t<ENTER> PARA CONTINUAR"); getchar();	
-		limpar_tela();
-	}
-
-	imprimir_fatura(reg);
-
+	
 	gravar_contrato_inativo(reg);
 
 	database_temp = fopen(DB_TMP, "w+b");

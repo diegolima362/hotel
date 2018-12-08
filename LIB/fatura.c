@@ -34,6 +34,11 @@ void adicionar_valor_fatura(SERVICE srv, int qtd, int alt, char *fat){
 	
 	FILE *fatura;
 	fatura = fopen(fat, "r+b");
+
+	if(alt == 1){
+		srv.prc *= 1.25;
+		srv.alt = true;
+	}
 	
 	int i;
 
@@ -62,48 +67,35 @@ void fechar_fatura(CONTRATO *p){
 	fatura = fopen(p->fat, "r+b");
 
 	while(fread(&srv, sizeof(SERVICE), 1, fatura)){
-		printf("SERIVICO: %s\n", srv.nome);
+		printf("SERVICO: %s\n", srv.nome);
 		printf("DATA: "); mostrar_dat(srv.data);putchar('\n');
-		vlr += srv.prc_norm;
+		vlr += srv.prc;
 	}
-
-	printf("VALOR: R$ %.2f\n", vlr); pausa();
-	p->fatura = vlr;
-	pausa();
-
-	remove(p->fat);
-}
-
-void mostrar_fatura(CONTRATO p){
-	limpar_tela();
-
-	printf("\t\t\tCAMPINA CONFORT PREMIUM\n");
-	printf("\t\t\t%s - %s\n", __DATE__, __TIME__ );
-	printf("\n---------------------------------------------------------\n");
-	printf("\t\tID: %.lf\n\n", p.cliente.id);
-	printf("\t\tNOME DO CLIENTE: %s\n", p.cliente.nome);
-	printf("\t\tCPF: %s\n", p.cliente.cpf);
-	printf("\t\tCARTAO DE CREDITO: %s\n", p.cliente.cred_card);
-	printf("\t\tTELEFONE DE CONTATO: %s\n", p.cliente.cel);
-	printf("\n\t\tQUARTO: %d\n", p.r.num);
-	printf("\n\t\tRESERVA: "); mostrar_dat(p.res.ini); printf(" - "); mostrar_dat(p.res.fim); putchar('\n');
-	printf("\n\t\tDADOS CLIENTE\n");
-	printf("\t\tENDERECO: ");
-	printf("\t\t%s, %d, %s\n", p.cliente.end.bairro, p.cliente.end.num, p.cliente.end.rua);
-	printf("\t\t%s - %s - %s\n", p.cliente.end.cidade, p.cliente.end.estado, p.cliente.end.pais);
-	printf("\n---------------------------------------------------------\n");
 	
+	p->fatura = vlr;
+	
+	char op[2];
+	limpar_tela();
+	printf("\n\tRESERVA FINALIZADA !\n");
+	printf("\n\tFATURA DETALHADA SALVA NA PASTA 'FATURAS' COM O NOME %.lf\n", p->id);
+		
+	imprimir_fatura(*p);
+	remove(p->fat);
 }
 
 void imprimir_fatura(CONTRATO p){
 
-	FILE *fatura;	
+	FILE* fatura;
+	FILE* srvs;
+	SERVICE srv;	
 	char pasta[]="FATURAS/"; 
 	char tipo[]=".txt";
 	
 	char *fat;
 	char nome[13];
 	nome_fatura(nome, p.id);
+
+	float alt = 0;
 
 	fat = (char *) malloc(sizeof(nome)+sizeof(pasta)+sizeof(tipo));
 	
@@ -112,6 +104,7 @@ void imprimir_fatura(CONTRATO p){
 	strcat(fat, tipo);
 	
 	fatura = fopen(fat, "w+");
+	srvs = fopen(p.fat, "r+b");
 
 	fprintf(fatura, "\t\t\t\t\t\tCAMPINA CONFORT PREMIUM\n\t\t\t\t\t\t\t");
 	fputs(__TIME__, fatura);
@@ -129,7 +122,28 @@ void imprimir_fatura(CONTRATO p){
 	fprintf(fatura,"%s, %d, %s\n", p.cliente.end.bairro, p.cliente.end.num, p.cliente.end.rua);
 	fprintf(fatura,"%s - %s - %s\n", p.cliente.end.cidade, p.cliente.end.estado, p.cliente.end.pais);
 	fprintf(fatura,"----------------------------------------------------------------------------------------------------------");
+	fprintf(fatura,"\nVALOR TOTAL DA FATURA: R$ %.2f\n", p.fatura);
+	fprintf(fatura,"\nTIPO DE RESERVA: %s\n", p.qrt.classe);
+	fprintf(fatura,"\nVALOR DA DIARIA: R$ %.2f - QUANTIDADE DE DIAS %d - VALOR DA RESERVA R$ %.2f\n", p.qrt.vlr_nrm, p.dias_reserva, p.qrt.vlr_nrm * (p.dias_reserva - p.dias_alt_tmp));
+	fprintf(fatura,"\nACRESCIMO DE ALTA TEMPORADA\nDIAS EM ALTA TEMPORADA: %d \tAUMENTO DE R$ %.2f\n", p.dias_alt_tmp, p.dias_alt_tmp * p.qrt.vlr_alt);
+	fprintf(fatura,"\nSERVICOS ADICIONAIS CONTRATADOS: \n\n");
+
+	while(fread(&srv, sizeof(SERVICE), 1, srvs)){
+		
+		DATE *data = localtime(&srv.data);
+		
+		fprintf(fatura,"%s - ", srv.nome);
+		
+		if(srv.alt == true)
+			alt = srv.prc*0.25;
+		else
+			alt = 0;
+		
+		fprintf(fatura,"DATA: %2d/%2d/%4d\t- R$ %.2f (+ R$ %.2f *ALTA TEMPORADA)\n", data->tm_mday,data->tm_mon + 1,data->tm_year + 1900, srv.prc, alt);
+	}
 
 	free(fat);
 	fclose(fatura);
+	fclose(srvs);
+	return;
 }

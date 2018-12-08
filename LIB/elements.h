@@ -54,8 +54,8 @@ typedef struct{
 typedef struct service{
 	char nome[30+1];
 	char dscric[66+1];
-	float prc_norm;
-	float prc_alta;
+	float prc;
+	bool alt;
 	time_t data;
 	int   id;
 }SERVICE;
