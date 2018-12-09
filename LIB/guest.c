@@ -74,7 +74,8 @@ void inserir_contrato(){
 	fechar_arquivos();
 
 	limpar_tela();
-	printf("\n\n\t\t\tRESERVA REALIZADA COM SUCESSO!\n\t\t<ENTER>");getchar();
+	printf("\n\n\t\t\tRESERVA REALIZADA COM SUCESSO!\n\t\t<ENTER>");
+	pausa();
 }
 
 
@@ -215,6 +216,7 @@ void remover_contrato(double n){
 	system("mv DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS_TMP.DAT DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS.DAT");
 	
 	remover_reserva(id);
+	printf("\n\tRESERVA FINALIZADA!!!\n\n\t\tDADOS DA COBRANCA SALVOS NO ARQUIVO COM NOME IGUAL O ID NA PASTA FATURA\n"); getchar();
 }
 
 

@@ -64,8 +64,9 @@ void bkp(){
 	if(alt_log()==0)
 		return;
 
-	system("cp DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS.DAT DATABASE/BKP/ \n");
-	system("cp DATABASE/QUARTOS/DB_ROOMS.DAT DATABASE/BKP/ \n");
+	system("cp -r DATABASE/CONTRATOS DATABASE/BKP/ \n");
+	system("cp -r DATABASE/QUARTOS DATABASE/BKP/ \n");
+	system("cp -r FATURAS/ DATABASE/BKP");
 	limpar_tela();
 	puts("\n\t\tBACK UP REALIZADO !!!");
 	getchar();
@@ -75,17 +76,9 @@ void res_bkp(){
 	if(alt_log()==0)
 		return;
 
-	if(system("cp DATABASE/BKP/DB_CLIENTS.DAT DATABASE/CONTRATOS/ABERTOS/\n" )==0){
-		limpar_tela();
-		puts("\n\t\tBACK UP RESTAURADO !!!");
-		getchar();
-	}
-
-	if(system("cp DATABASE/BKP/DB_ROOMS.DAT DATABASE/QUARTOS/\n" )==0){
-		limpar_tela();
-		puts("\n\t\tBACK UP RESTAURADO !!!");
-		getchar();
-	}
+	system("cp -r DATABASE/BKP/CONTRATOS  DATABASE/\n");
+	system("cp -r DATABASE/BKP/QUARTOS DATABASE/ \n");
+	system("cp -r DATABASE/BKP/FATURAS ./");
 }
 
 
