@@ -19,6 +19,12 @@ void mostrar_srvc(SERVICE srvc){
 
 void contratar_srvc(){
 	
+	if(contar_clientes()==0){
+		printf("\n\n\t\tNAO EXITEM HOSPEDES REGISTRADOS!!!\n");
+		getchar();
+		return;
+	}
+
 	CONTRATO p;
 	
 	double c_id;

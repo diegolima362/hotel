@@ -135,7 +135,6 @@ void alterar_contrato(double n){
 	
 }
 
-
 void remover_contrato(double n){
 	
 	if(contar_clientes() == 0){
@@ -157,10 +156,11 @@ void remover_contrato(double n){
 		id = menu_remove();
 	}
 
-	rewind(database);
 
+	rewind(database);
+	
 	while(fread(&reg,sizeof(CONTRATO),1,database)){
-		if(reg.id == id && reg.status){
+		if(reg.r.id == id){
 			x=1;
 			break;
 		}
@@ -168,7 +168,7 @@ void remover_contrato(double n){
 
 	if(x==0){
 		puts("ID INEXISTENTE OU PROBLEMAS NO POSICIONAMENTO!!!\n");
-		tipo_de_erro(2);
+		getchar();
 		return;
 	}
 
@@ -182,40 +182,39 @@ void remover_contrato(double n){
 
 	if(op[0] != 'S'){
 		printf("\n\tRESERVA NAO FINALIZADA !!! \n\n"); getchar();
-		tipo_de_erro(2);
 		limpar_tela();
 		return;
 	}
 	
-	reg.status=false;
-	
 	fechar_fatura(&reg);
-	
-	
+		
 	gravar_contrato_inativo(reg);
 
-	database_temp = fopen(DB_TMP, "w+b");
+	database_temp = fopen("DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS_TMP.DAT", "w+b");
+	
+	
+	rewind(database);
 
 	while(fread(&reg,sizeof(CONTRATO),1,database)){
-		if(reg.status == true){
-			gravar_contrato_tmp(reg);
+		
+		if(reg.id != id){
+			
+			fseek(database_temp, 0L, SEEK_END);
+	
+			if(fwrite(&reg, sizeof(CONTRATO),1,database_temp)!=1){
+				puts(">>>> ERRO AO ADICIONAR O CLIENTE AO REGISTRO\n\n");
+				getchar();
+			}
 		}
 	}
-
-	while(fread(&reg,sizeof(CONTRATO),1,database_temp)){
-		if(reg.status == true){
-			mostrar_cliente(reg);
-		}
-	}
-	pausa();
-
-	remove(DB);
-	system("cp DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS_TMP.DAT DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS.DAT");
+	
+	fclose(database_temp);
+	fclose(database);
+	
+	system("mv DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS.DAT DATABASE/CONTRATOS/ABERTOS/OLD.DAT");
+	system("mv DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS_TMP.DAT DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS.DAT");
 	
 	remover_reserva(id);
-	
-	fechar_arquivos();
-	fechar_qrts();
 }
 
 
@@ -323,27 +322,31 @@ int reservas_registradas(){
 void remover_reserva(double id){
 
 	RESERVAS reg;
-	
+
 	rewind(l_rooms);
 
-	while(fread(&reg,sizeof(RESERVAS),1,l_rooms)){
-		if(reg.id == id){
-			reg.status = false;
-			break;
-		}
-	}
-
-	l_rooms_temp = fopen(L_QTMP, "w+b");
-
-	while(fread(&reg,sizeof(RESERVAS),1,l_rooms)){
-		if(reg.status==true){
-			gravar_reservas_temp(reg);
-		}
-	}
+	l_rooms_temp = fopen("DATABASE/QUARTOS/REG_ROOMS_TMP.DAT", "w+b");
 	
+	while(fread(&reg,sizeof(RESERVAS),1,l_rooms)){
+			
+		if(reg.id!=id){
+				
+			fseek(l_rooms_temp, 0L, SEEK_END);
+
+			if(fwrite(&reg, sizeof(RESERVAS),1,l_rooms_temp)!=1){
+				puts(">>>> ERRO AO ADICIONAR RESRVA AO REGISTRO\n\n");
+			}
+
+		}
+	}
+
 	fclose(l_rooms_temp);
-	remove(L_QRTS);
-	system("cp DATABASE/QUARTOS/REG_ROOMS_TMP.DAT DATABASE/QUARTOS/REG_ROOMS.DAT");
+
+	l_rooms_temp = fopen("DATABASE/QUARTOS/REG_ROOMS_TMP.DAT", "r+b");
+	
+	fclose(l_rooms);
+	system("mv DATABASE/QUARTOS/REG_ROOMS.DAT DATABASE/QUARTOS/OLD_ROOMS.DAT");
+	system("mv DATABASE/QUARTOS/REG_ROOMS_TMP.DAT DATABASE/QUARTOS/REG_ROOMS.DAT");
 
 }
 
