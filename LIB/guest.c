@@ -186,11 +186,12 @@ void remover_contrato(double n){
 		limpar_tela();
 		return;
 	}
+
+	gravar_contrato_inativo(reg);
 	
 	fechar_fatura(&reg);
 		
-	gravar_contrato_inativo(reg);
-
+	
 	database_temp = fopen("DATABASE/CONTRATOS/ABERTOS/DB_CLIENTS_TMP.DAT", "w+b");
 	
 	
@@ -243,8 +244,7 @@ void gravar_contrato_inativo(CONTRATO p){
 	if(fwrite(&p, sizeof(CONTRATO),1,database_reg)!=1){
 		puts(">>>> ERRO AO ADICIONAR O CLIENTE AO REGISTRO\n\n");
 		tipo_de_erro(2); getchar();
-	}
-
+	}pausa();
 	fclose(database_reg);
 }
 
