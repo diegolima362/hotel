@@ -36,7 +36,6 @@ void adicionar_valor_fatura(SERVICE srv, int qtd, int alt, char *fat){
 	fatura = fopen(fat, "r+b");
 
 	if(alt == 1){
-		srv.prc *= 1.25;
 		srv.alt = true;
 	}
 	
@@ -59,10 +58,10 @@ void adicionar_valor_fatura(SERVICE srv, int qtd, int alt, char *fat){
 void fechar_fatura(CONTRATO *p){
 	SERVICE srv;
 	FILE *fatura;
-	float vlr = 0;
+	float vlr = 0, vlra = 0;
 
-	vlr += (p->dias_reserva - p->dias_alt_tmp) * p->qrt.vlr_nrm;
-	vlr += p->dias_alt_tmp * p->qrt.vlr_nrm;
+	vlr = p->dias_reserva * p->qrt.vlr_nrm;
+	vlra = p->dias_alt_tmp * (p->qrt.vlr_nrm * 0.25);
 
 	fatura = fopen(p->fat, "r+b");
 
@@ -70,9 +69,11 @@ void fechar_fatura(CONTRATO *p){
 		printf("SERVICO: %s\n", srv.nome);
 		printf("DATA: "); mostrar_dat(srv.data);putchar('\n');
 		vlr += srv.prc;
+		if(srv.alt == true)
+			vlr += srv.prc*0.25;
 	}
 	
-	p->fatura = vlr;
+	p->fatura = vlr+vlra;
 	
 	char op[2];
 	limpar_tela();
@@ -117,15 +118,20 @@ void imprimir_fatura(CONTRATO p){
 	fprintf(fatura,"CARTAO DE CREDITO: %s\n", p.cliente.cred_card);
 	fprintf(fatura,"TELEFONE DE CONTATO: %s\n", p.cliente.cel);
 	fprintf(fatura,"\nQUARTO: %d\n", p.r.num);
+
+	DATE *data = localtime(&p.res.ini);
+	fprintf(fatura,"\nPERIODO HOSPEDADO: %2d/%2d/%4d - ", data->tm_mday, data->tm_mon + 1, data->tm_year + 1900);
+	data = localtime(&p.res.fim);
+	fprintf(fatura,"%2d/%2d/%4d\n", data->tm_mday, data->tm_mon + 1, data->tm_year + 1900);
 	fprintf(fatura,"\nDADOS CLIENTE\n");
 	fprintf(fatura,"ENDERECO: ");
 	fprintf(fatura,"%s, %d, %s\n", p.cliente.end.bairro, p.cliente.end.num, p.cliente.end.rua);
 	fprintf(fatura,"%s - %s - %s\n", p.cliente.end.cidade, p.cliente.end.estado, p.cliente.end.pais);
 	fprintf(fatura,"----------------------------------------------------------------------------------------------------------");
-	fprintf(fatura,"\nVALOR TOTAL DA FATURA: R$ %.2f\n", p.fatura);
+	fprintf(fatura,"\n\nVALOR TOTAL DA FATURA: R$ %.2f\n", p.fatura);
 	fprintf(fatura,"\nTIPO DE RESERVA: %s\n", p.qrt.classe);
-	fprintf(fatura,"\nVALOR DA DIARIA: R$ %.2f - QUANTIDADE DE DIAS %d - VALOR DA RESERVA R$ %.2f\n", p.qrt.vlr_nrm, p.dias_reserva, p.qrt.vlr_nrm * (p.dias_reserva - p.dias_alt_tmp));
-	fprintf(fatura,"\nACRESCIMO DE ALTA TEMPORADA\nDIAS EM ALTA TEMPORADA: %d \tAUMENTO DE R$ %.2f\n", p.dias_alt_tmp, p.dias_alt_tmp * p.qrt.vlr_alt);
+	fprintf(fatura,"\nVALOR DA DIARIA: R$ %.2f\nQUANTIDADE DE DIAS %d\nVALOR DA RESERVA R$ %.2f\n", p.qrt.vlr_nrm, p.dias_reserva, p.qrt.vlr_nrm * p.dias_reserva);
+	fprintf(fatura,"\nACRESCIMO DE ALTA TEMPORADA\nDIAS EM ALTA TEMPORADA: %d \tAUMENTO DE R$ %.2f\n", p.dias_alt_tmp, p.dias_alt_tmp * (p.qrt.vlr_nrm*0.25));
 	fprintf(fatura,"\nSERVICOS ADICIONAIS CONTRATADOS: \n\n");
 
 	while(fread(&srv, sizeof(SERVICE), 1, srvs)){
