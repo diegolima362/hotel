@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="hotel"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/diego/CLionProjects/hotel/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/diego/CLionProjects/hotel/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="hotel">
+				<Option output="/home/diego/CLionProjects/hotel/cmake-build-debug/hotel" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/diego/CLionProjects/hotel/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 hotel"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="hotel/fast">
+				<Option output="/home/diego/CLionProjects/hotel/cmake-build-debug/hotel" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/diego/CLionProjects/hotel/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 hotel/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/diego/CLionProjects/hotel/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/diego/CLionProjects/hotel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/diego/CLionProjects/hotel/libs/datas.h">
+			<Option target="hotel"/>
+		</Unit>
+		<Unit filename="/home/diego/CLionProjects/hotel/libs/extrafuncs.c">
+			<Option target="hotel"/>
+		</Unit>
+		<Unit filename="/home/diego/CLionProjects/hotel/libs/extrafuncs.h">
+			<Option target="hotel"/>
+		</Unit>
+		<Unit filename="/home/diego/CLionProjects/hotel/libs/login.c">
+			<Option target="hotel"/>
+		</Unit>
+		<Unit filename="/home/diego/CLionProjects/hotel/libs/login.h">
+			<Option target="hotel"/>
+		</Unit>
+		<Unit filename="/home/diego/CLionProjects/hotel/libs/services.c">
+			<Option target="hotel"/>
+		</Unit>
+		<Unit filename="/home/diego/CLionProjects/hotel/libs/services.h">
+			<Option target="hotel"/>
+		</Unit>
+		<Unit filename="/home/diego/CLionProjects/hotel/libs/tipos.h">
+			<Option target="hotel"/>
+		</Unit>
+		<Unit filename="/home/diego/CLionProjects/hotel/main.c">
+			<Option target="hotel"/>
+		</Unit>
+		<Unit filename="/home/diego/CLionProjects/hotel/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
