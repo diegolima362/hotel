@@ -20,6 +20,6 @@ typedef struct {
 
 /**
  * mostrar detalhes de um serviço
- * @param srvc
+ * @param service
  */
-void mostrar_service(SERVICE srvc);
+void mostrar_service(SERVICE service);

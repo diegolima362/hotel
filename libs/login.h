@@ -7,12 +7,12 @@
 
 #endif //HOTEL_LOGIN_H
 
-#define PATHLOGIN "data/usr/"
-#define PATHUSERFILE "data/usr/hotel.psswd"
+#define PATH_LOGIN "data/usr/"
+#define PATH_USER_FILE "data/usr/data.pwd"
 
 typedef struct {
-    char user[20];
-    char senha[20];
+    char usr[21];
+    char pwd[21];
 } LOGIN;
 
 int validar_login(LOGIN *login_comparacao);

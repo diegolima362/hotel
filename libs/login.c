@@ -6,12 +6,14 @@
 #include "extrafuncs.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int existe_usuario_cadastrado() {
-    FILE *teste;
-    if (teste = fopen(PATHUSERFILE, "r+b")) {
-        fclose(teste);
+    FILE *test = fopen(PATH_USER_FILE, "r+b");
+
+    if (test) {
+        fclose(test);
         return 1;
     }
 
@@ -19,11 +21,13 @@ int existe_usuario_cadastrado() {
 }
 
 int validar_login(LOGIN *login_comparacao) {
-    LOGIN *login_certo;
+    LOGIN *login_certo = (LOGIN *) calloc(1, sizeof(LOGIN *));
     pegar_dados_arquivo_login(login_certo);
 
-    int user_certo = strcmp(login_certo->user, login_comparacao->user);
-    int senha_certa = strcmp(login_certo->senha, login_comparacao->senha);
+    int user_certo = strcmp(login_certo->usr, login_comparacao->usr);
+    int senha_certa = strcmp(login_certo->pwd, login_comparacao->pwd);
+
+    free(login_certo);
 
     if (user_certo == 0 && senha_certa == 0)
         return 1;
@@ -33,15 +37,15 @@ int validar_login(LOGIN *login_comparacao) {
 
 void pegar_dados_arquivo_login(LOGIN *login) {
     FILE *arquivo_login;
-    arquivo_login = fopen(PATHUSERFILE, "r+b");
+    arquivo_login = fopen(PATH_USER_FILE, "r+b");
     fread(login, sizeof(LOGIN), 1, arquivo_login);
     fclose(arquivo_login);
 }
 
 int gravar_dados_arquivo_login(LOGIN *login) {
-    FILE *arquivo_login = fopen(PATHUSERFILE, "w+b");
+    FILE *arquivo_login = fopen(PATH_USER_FILE, "w+b");
 
-    int login_gravado = fwrite(login, sizeof(LOGIN), 1, arquivo_login);
+    int login_gravado = (int) fwrite(login, sizeof(LOGIN), 1, arquivo_login);
 
     fclose(arquivo_login);
 

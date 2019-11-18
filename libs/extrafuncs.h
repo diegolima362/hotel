@@ -2,10 +2,10 @@
 // Created by diego on 03/09/2019.
 //
 
-#ifndef HOTEL_EXTRAFUNCS_H
-#define HOTEL_EXTRAFUNCS_H
+#ifndef HOTEL_EXTRA_FUNCS_H
+#define HOTEL_EXTRA_FUNCS_H
 
-#endif //HOTEL_EXTRAFUNCS_H
+#endif //HOTEL_EXTRA_FUNCS_H
 
 /**
  * limpar o terminal

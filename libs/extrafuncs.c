@@ -7,6 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void upper(char *str) {
     while (*str) {
@@ -26,10 +27,5 @@ void limpar_teclado() {
 }
 
 void limpar_tela() {
-    int i = 0;
-    while (i < 10) {
-        printf("\n\n\n");
-        i++;
-    }
-
+    system("clear");
 }

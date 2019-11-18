@@ -1,3 +1,0 @@
-/home/diego/CLionProjects/hotel/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/diego/CLionProjects/hotel/cmake-build-debug/CMakeFiles/hotel.dir
-/home/diego/CLionProjects/hotel/cmake-build-debug/CMakeFiles/edit_cache.dir
