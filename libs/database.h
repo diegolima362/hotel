@@ -9,6 +9,8 @@
 
 #include <time.h>
 
+#define DB_PATH "data/hotel.db"
+
 typedef struct quarto {
     int id;
     int tipo;
@@ -45,6 +47,8 @@ typedef struct reserva {
 } RESERVA;
 
 char *executar_query(char *query, int (*callback)(void *, int, char **, char **));
+
+int criar_banco();
 
 int inserir_cliente(CLIENTE *c);
 

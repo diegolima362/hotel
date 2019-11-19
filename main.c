@@ -58,11 +58,12 @@ void mostrar_reserva(RESERVA *r, CLIENTE *c);
 void busca_cliente_id(int id_cliente, CLIENTE *cliente);
 
 int main(int argc, char *argv[]) {
-    buscar_cliente("id", "8", -1);
-    buscar_cliente("nome", "joao", -1);
-    buscar_cliente("cpf", "123", -1);
-    remover_cliente("id", "8");
-    buscar_cliente("id", "8", -1);
+    checar_diretorios();
+//    buscar_cliente("id", "8", -1);
+//    buscar_cliente("nome", "joao", -1);
+//    buscar_cliente("cpf", "123", -1);
+//    remover_cliente("id", "8");
+//    buscar_cliente("id", "8", -1);
 
     return 0;
 }
@@ -382,17 +383,24 @@ int gerar_id(int tipo) {
 void checar_diretorios() {
     FILE *ativo = fopen("data/usr/.ativo", "r+b");
 
-    if (ativo != NULL) {
-        fclose(ativo);
-        return;
+
+    if (ativo == NULL) {
+        mkdir("data/", 0700);
+        mkdir("data/usr/", 0700);
+
+        ativo = fopen("data/usr/.ativo", "w+b");
     }
 
-    // criar diretorios
-    mkdir("data/", 0700);
-    mkdir("data/usr/", 0700);
-    ativo = fopen("data/usr/.ativo", "w+b");
-
     fclose(ativo);
+
+    FILE *db = fopen(DB_PATH, "r+b");
+
+    if (db == NULL) {
+        db = fopen(DB_PATH, "w+b");
+        fclose(db);
+        criar_banco();
+    } else { fclose(db); }
+
 }
 
 int autenticar() {
