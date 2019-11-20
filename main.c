@@ -51,14 +51,16 @@ int gravar_dados_arquivo_reserva(RESERVA *r);
 
 int gravar_dados_arquivo_cliente(CLIENTE *c);
 
-void listar_reservas();
-
 void mostrar_reserva(RESERVA *r, CLIENTE *c);
 
 void busca_cliente_id(int id_cliente, CLIENTE *cliente);
 
 int main(int argc, char *argv[]) {
     checar_diretorios();
+    listar_reservas("id_cliente", "1", -1);
+    listar_clientes("id", "1", -1);
+    listar_quartos("valor", "1200", -1);
+
 //    buscar_cliente("id", "8", -1);
 //    buscar_cliente("nome", "joao", -1);
 //    buscar_cliente("cpf", "123", -1);
@@ -245,11 +247,10 @@ void menu_reservas() {
 
 void nova_reserva() {
     CLIENTE *c = (CLIENTE *) calloc(1, sizeof(CLIENTE));
-    //novo_cliente(c);
-    //inserir_cliente(c);
-    recuperar_clientes(NULL);
+    RESERVA *r = (RESERVA *) malloc(sizeof(RESERVA));
 
-    //RESERVA *r = (RESERVA *) malloc(sizeof(RESERVA));
+    free(c);
+
 }
 
 void novo_cliente(CLIENTE *c) {
@@ -301,20 +302,6 @@ void novo_cliente(CLIENTE *c) {
 //    fgets(c->end.pais, 31, stdin);
 //    remover_quebra(c->end.pais);
 
-}
-
-void listar_reservas() {
-    FILE *reservas = fopen("data/usr/.reservas", "r+b");
-    RESERVA r;
-    CLIENTE c;
-//    while (fread(&r, sizeof(RESERVA *), 1, reservas) != 1) {
-//        puts("aq");
-//        mostrar_reserva(&r);
-//    }
-    fread(&r, sizeof(RESERVA *), 1, reservas);
-    busca_cliente_id(r.id_cliente, &c);
-    mostrar_reserva(&r, &c);
-    fclose(reservas);
 }
 
 void busca_cliente_id(int id_cliente, CLIENTE *cliente) {

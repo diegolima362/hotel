@@ -52,15 +52,17 @@ int criar_banco();
 
 int inserir_cliente(CLIENTE *c);
 
-int mostrar_clientes(void *ptr, int resultados, char **STR1, char **STR2);
+int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2);
 
-int listar_clientes(char *filtro, int limit);
+int listar_clientes(char *column, char *filter, int limit);
+
+int listar_reservas(char *column, char *filter, int limit);
+
+int listar_quartos(char *column, char *filter, int limit);
 
 int montar_cliente(void *ptr, int resultados, char **STR1, char **STR2);
 
 int recuperar_clientes(CLIENTE *c);
-
-int buscar_cliente(char *column, char *filter, int limit);
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2);
 

@@ -21,6 +21,12 @@ char *executar_query(char *query, int (*callback)(void *, int, char **, char **)
     return error_msg;
 }
 
+void criar_quartos(int n, char *query, sqlite3 *db) {
+    char *error_msg;
+    for (int i = 0; i < n; i++)
+        sqlite3_exec(db, query, NULL, NULL, &error_msg);
+}
+
 void gerar_dados(sqlite3 *db) {
     char *error_msg, *error_msg1, *error_msg2;
 
@@ -48,18 +54,17 @@ void gerar_dados(sqlite3 *db) {
                      "insert into reservas values (null, ABS(RANDOM() % 10), ABS(RANDOM() % 10), current_date, current_timestamp);"
                      "insert into reservas values (null, ABS(RANDOM() % 10), ABS(RANDOM() % 10), current_date, current_timestamp);"
                      "insert into reservas values (null, ABS(RANDOM() % 10), ABS(RANDOM() % 10), current_date, current_timestamp);";
-    char *quartos = "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));"
-                    "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));"
-                    "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));"
-                    "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));"
-                    "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));"
-                    "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));"
-                    "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));"
-                    "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));"
-                    "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));"
-                    "insert into quartos values (not null, abs(random() % 5), 'simples ', abs(random() % 1000) / 3, 1 + abs(random() % 10));";
+
     sqlite3_exec(db, cliente, NULL, NULL, &error_msg);
-    sqlite3_exec(db, quartos, NULL, NULL, &error_msg1);
+
+    criar_quartos(20, "insert into quartos values (null, 1, 'Executivo triplo', 0, 440, null, null);", db);
+    criar_quartos(15, "insert into quartos values (null, 2, 'Executivo duplo', 0, 385, null, null);", db);
+    criar_quartos(5, "insert into quartos values (null, 3, 'Executivo simples', 0, 360, null, null);", db);
+    criar_quartos(20, "insert into quartos values (null, 4, 'Luxo triplo', 0, 620, null, null);", db);
+    criar_quartos(15, "insert into quartos values (null, 5, 'Luxo duplo', 0, 570, null, null);", db);
+    criar_quartos(5, "insert into quartos values (null, 6, 'Luxo simples', 0, 520, null, null);", db);
+    criar_quartos(5, "insert into quartos values (null, 7, 'Presidencial', 0, 1200, null, null);", db);
+
     sqlite3_exec(db, reservas, NULL, NULL, &error_msg2);
 
     puts(error_msg);
@@ -72,16 +77,13 @@ int criar_banco() {
     sqlite3 *db;
     sqlite3_open(DB_PATH, &db);
 
-    char *table_clientes = (char *) malloc(sizeof(char) * 250);
-    char *table_quartos = (char *) malloc(sizeof(char) * 250);
-    char *table_reservas = (char *) malloc(sizeof(char) * 250);
 
-    strcpy(table_clientes,
-           "create table clientes ( id integer constraint clientes_pk primary key autoincrement, nome char(15), cpf char(11), id_reserva integer constraint clientes_reservas_id_fk references reservas (id), id_quarto integer); create unique index clientes_id_uindex on clientes (id);");
-    strcpy(table_quartos,
-           "create table quartos ( id integer constraint quarto_pk primary key autoincrement, tipo integer, descricao char(15), valor real, id_cliente integer constraint quarto_clientes_id_fk references clientes (id)); create unique index quartos_id_uindex on quartos (id);");
-    strcpy(table_reservas,
-           "create table reservas ( id integer constraint reservas_pk primary key autoincrement, id_cliente integer \tconstraint reservas_clientes_id_fk references clientes, id_quarto integer constraint reservas_quartos_id_fk references quartos, inicio text, fim text ); create unique index reservas_id_uindex on reservas (id);\n");
+    char *table_clientes =
+            "create table clientes ( id integer constraint clientes_pk primary key autoincrement, nome char(15), cpf char(11), id_reserva integer constraint clientes_reservas_id_fk references reservas (id), id_quarto integer); create unique index clientes_id_uindex on clientes (id);";
+    char *table_quartos =
+            "create table quartos ( id integer constraint quarto_pk primary key autoincrement, tipo integer, descricao char(15), ocupado integer, valor real, id_cliente integer constraint quarto_clientes_id_fk references clientes (id), id_reserva integer constraint quarto_reserva_id_fk references reservas (id)); create unique index quartos_id_uindex on quartos (id);";
+    char *table_reservas =
+            "create table reservas ( id integer constraint reservas_pk primary key autoincrement, id_cliente integer \tconstraint reservas_clientes_id_fk references clientes, id_quarto integer constraint reservas_quartos_id_fk references quartos, inicio text, fim text ); create unique index reservas_id_uindex on reservas (id);\n";
     int created;
     if (sqlite3_exec(db, table_clientes, NULL, NULL, &error_msg) == SQLITE_OK &&
         sqlite3_exec(db, table_quartos, NULL, NULL, &error_msg1) == SQLITE_OK &&
@@ -91,13 +93,6 @@ int criar_banco() {
         created = 0;
     }
     gerar_dados(db);
-    puts(error_msg);
-    puts(error_msg1);
-    puts(error_msg2);
-    free(table_clientes);
-    free(table_quartos);
-    free(table_reservas);
-
     sqlite3_close(db);
 
     return created;
@@ -121,71 +116,18 @@ int inserir_cliente(CLIENTE *c) {
     return 0;
 }
 
-int mostrar_clientes(void *ptr, int resultados, char **STR1, char **STR2) {
-    printf("%3s", STR1[0]);
-    printf("|%10s", STR1[1]);
-    printf("|%15s\n", STR1[2]);
-
-    return 0;
-}
-
-int listar_clientes(char *filtro, int limit) {
-    char *query = (char *) malloc(sizeof(char) * 150);
-    char char_limit[3];
-    snprintf(char_limit, 3, "%d", limit);
-
-    strcpy(query, "select * from clientes ");
-    if (limit > 0) {
-        strcat(query, "limit ");
-        strcat(query, char_limit);
+int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2) {
+    int i = 0;
+    while (STR1[i]) {
+        printf("%s ", STR1[i]);
+        i++;
     }
-    strcat(query, ";");
-
-    executar_query(query, mostrar_clientes);
-
-    free(query);
+    putchar('\n');
 
     return 0;
 }
 
-int listar_reservas(char *filtro, int limit) {
-    char *query = (char *) malloc(sizeof(char) * 150);
-    char char_limit[3];
-    snprintf(char_limit, 3, "%d", limit);
-
-    strcpy(query, "select * from reservas ");
-    if (limit > 0) {
-        strcat(query, "limit ");
-        strcat(query, char_limit);
-    }
-    strcat(query, ";");
-
-    executar_query(query, mostrar_clientes);
-
-    free(query);
-
-    return 0;
-}
-
-int montar_cliente(void *ptr, int resultados, char **STR1, char **STR2) {
-    int i;
-
-    for (i = 0; STR1[i] != NULL; i++) {
-        printf("%s = %s\n", STR2[i], STR1[i]);
-    }
-
-    return 0;
-}
-
-int recuperar_clientes(CLIENTE *c) {
-    char *query = (char *) malloc(sizeof(char) * 150);
-    strcpy(query, "select clientes.id, clientes.nome, clientes.cpf from clientes;");
-    executar_query(query, montar_cliente);
-    free(query);
-    return 0;
-}
-
-int buscar_cliente(char *column, char *filter, int limit) {
+int listar_clientes(char *column, char *filter, int limit) {
     char *query = (char *) malloc(sizeof(char) * 150);
     char char_limit[3];
     snprintf(char_limit, 3, "%d", limit);
@@ -209,10 +151,89 @@ int buscar_cliente(char *column, char *filter, int limit) {
     }
 
     strcat(query, ";");
-    executar_query(query, mostrar_clientes);
+    executar_query(query, mostrar_resultados);
 
     free(query);
 
+    return 0;
+}
+
+int listar_reservas(char *column, char *filter, int limit) {
+    char *query = (char *) malloc(sizeof(char) * 150);
+    char char_limit[3];
+    snprintf(char_limit, 3, "%d", limit);
+
+    strcpy(query, "select * from reservas where ");
+
+    if (strcmp(column, "id") == 0 || strcmp(column, "id_cliente") == 0) {
+        strcat(query, column);
+        strcat(query, " = ");
+        strcat(query, filter);
+    } else {
+        strcat(query, column);
+        strcat(query, " like '");
+        strcat(query, filter);
+        strcat(query, "' ");
+    }
+
+    if (limit > 0) {
+        strcat(query, " limit ");
+        strcat(query, char_limit);
+    }
+
+    strcat(query, ";");
+    executar_query(query, mostrar_resultados);
+
+    free(query);
+
+    return 0;
+}
+
+int listar_quartos(char *column, char *filter, int limit) {
+    char *query = (char *) malloc(sizeof(char) * 150);
+    char char_limit[3];
+    snprintf(char_limit, 3, "%d", limit);
+
+    strcpy(query, "select * from quartos where ");
+
+    if (strcmp(column, "id") == 0 || strcmp(column, "valor") == 0) {
+        strcat(query, column);
+        strcat(query, " = ");
+        strcat(query, filter);
+    } else {
+        strcat(query, column);
+        strcat(query, " like '");
+        strcat(query, filter);
+        strcat(query, "' ");
+    }
+
+    if (limit > 0) {
+        strcat(query, " limit ");
+        strcat(query, char_limit);
+    }
+
+    strcat(query, ";");
+    executar_query(query, mostrar_resultados);
+
+    free(query);
+    return 0;
+}
+
+int montar_cliente(void *ptr, int resultados, char **STR1, char **STR2) {
+    int i;
+
+    for (i = 0; STR1[i] != NULL; i++) {
+        printf("%s = %s\n", STR2[i], STR1[i]);
+    }
+
+    return 0;
+}
+
+int recuperar_clientes(CLIENTE *c) {
+    char *query = (char *) malloc(sizeof(char) * 150);
+    strcpy(query, "select clientes.id, clientes.nome, clientes.cpf from clientes;");
+    executar_query(query, montar_cliente);
+    free(query);
     return 0;
 }
 
@@ -247,7 +268,7 @@ int remover_cliente(char *column, char *filter) {
     }
 
     strcat(query, ";");
-    executar_query(query, mostrar_clientes);
+    executar_query(query, mostrar_resultados);
 
     free(query);
 
