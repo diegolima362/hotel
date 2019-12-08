@@ -8,6 +8,11 @@
 #endif //HOTEL_EXTRA_FUNCS_H
 
 /**
+ * espera pressionar tecla
+ */
+void pausa();
+
+/**
  * limpar o terminal
  */
 void limpar_tela();

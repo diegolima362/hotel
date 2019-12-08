@@ -9,6 +9,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void pausa() {
+    getchar();
+    getchar();
+}
+
 void upper(char *str) {
     while (*str) {
         *str = toupper(*str);

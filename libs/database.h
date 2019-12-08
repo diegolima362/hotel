@@ -10,6 +10,7 @@
 #include <time.h>
 
 #define DB_PATH "data/hotel.db"
+#define str_null "NULL"
 
 typedef struct quarto {
     int id;
@@ -29,12 +30,13 @@ typedef struct end {
 
 typedef struct cliente {
     int id;
-    char nome[100 + 1];
+    char nome[31];
+    char sobrenome[31];
     char cpf[15];
-    char cred_card[30];
-    char phone[20];
-    struct end end;
-    int ativo;
+    char cred_card[20];
+    char phone[15];
+    //struct end end;
+    //int ativo;
 } CLIENTE;
 
 typedef struct reserva {
@@ -46,7 +48,7 @@ typedef struct reserva {
     time_t fim;
 } RESERVA;
 
-char *executar_query(char *query, int (*callback)(void *, int, char **, char **));
+char *executar_query(char *query, int (*callback)(void *, int, char **, char **), void *ptr);
 
 int criar_banco();
 
@@ -54,7 +56,7 @@ int inserir_cliente(CLIENTE *c);
 
 int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2);
 
-int listar_clientes(char *column, char *filter, int limit);
+int listar_clientes(char *column, char *filter, int limit, int (*callback)(void *, int, char **, char **));
 
 int listar_reservas(char *column, char *filter, int limit);
 
@@ -62,11 +64,13 @@ int listar_quartos(char *column, char *filter, int limit);
 
 int montar_cliente(void *ptr, int resultados, char **STR1, char **STR2);
 
-int recuperar_clientes(CLIENTE *c);
+CLIENTE *recuperar_clientes(CLIENTE *c, char *id);
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2);
 
 int qtd_clientes();
+
+int qtd_reservas();
 
 int remover_cliente(char *column, char *filter);
 
