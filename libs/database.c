@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "sqlite/sqlite3.h"
+#include <sqlite3.h>
 
 char *executar_query(char *query, int (*callback)(void *, int, char **, char **), void *ptr) {
     char *error_msg;
@@ -27,6 +27,7 @@ void criar_quartos(int n, char *query, sqlite3 *db) {
 }
 
 void gerar_dados(sqlite3 *db) {
+    sqlite3_open(DB_PATH, &db);
     char *error_msg, *error_msg1;
 
     char *cliente = "insert into clientes values (null, 'joao', '123','3115', 0, 0);"
@@ -53,9 +54,11 @@ void gerar_dados(sqlite3 *db) {
                      "insert into reservas values (null, ABS(RANDOM() % 10), ABS(RANDOM() % 10), current_date, current_timestamp);"
                      "insert into reservas values (null, ABS(RANDOM() % 10), ABS(RANDOM() % 10), current_date, current_timestamp);"
                      "insert into reservas values (null, ABS(RANDOM() % 10), ABS(RANDOM() % 10), current_date, current_timestamp);";
-
+    puts("CLIENTES ...");
     sqlite3_exec(db, cliente, NULL, NULL, &error_msg);
+    puts("CLIENTES OK");
 
+    puts("QUARTOS ...");
     criar_quartos(20, "insert into quartos values (null, 1, 'Executivo triplo', 0, 440, null, null);", db);
     criar_quartos(15, "insert into quartos values (null, 2, 'Executivo duplo', 0, 385, null, null);", db);
     criar_quartos(5, "insert into quartos values (null, 3, 'Executivo simples', 0, 360, null, null);", db);
@@ -63,8 +66,12 @@ void gerar_dados(sqlite3 *db) {
     criar_quartos(15, "insert into quartos values (null, 5, 'Luxo duplo', 0, 570, null, null);", db);
     criar_quartos(5, "insert into quartos values (null, 6, 'Luxo simples', 0, 520, null, null);", db);
     criar_quartos(5, "insert into quartos values (null, 7, 'Presidencial', 0, 1200, null, null);", db);
+    puts("QUARTOS OK");
 
+    puts("RESERVAS ...");
     sqlite3_exec(db, reservas, NULL, NULL, &error_msg1);
+    puts("RESERVAS OK");
+
     if (error_msg && error_msg1) {
         puts(error_msg);
         puts(error_msg1);
@@ -77,20 +84,36 @@ int criar_banco() {
     sqlite3 *db;
     sqlite3_open(DB_PATH, &db);
 
-
     char *table_clientes =
-            "create table clientes ( id integer constraint clientes_pk primary key autoincrement, nome char(15), cpf char(11), phone char(15), id_reserva integer constraint clientes_reservas_id_fk references reservas (id), id_quarto integer); create unique index clientes_id_uindex on clientes (id);";
+            "create table clientes ( id integer constraint clientes_pk primary key autoincrement, nome char(15), cpf char(11), "
+            "phone char(15), id_reserva integer constraint clientes_reservas_id_fk references reservas (id), id_quarto integer); "
+            "create unique index clientes_id_uindex on clientes (id);";
     char *table_quartos =
-            "create table quartos ( id integer constraint quarto_pk primary key autoincrement, tipo integer, descricao char(15), ocupado integer, valor real, id_cliente integer constraint quarto_clientes_id_fk references clientes (id), id_reserva integer constraint quarto_reserva_id_fk references reservas (id)); create unique index quartos_id_uindex on quartos (id);";
+            "create table quartos ( id integer constraint quarto_pk primary key autoincrement, tipo integer, descricao char(15), "
+            "ocupado integer, valor real, id_cliente integer constraint quarto_clientes_id_fk references clientes (id), "
+            "id_reserva integer constraint quarto_reserva_id_fk references reservas (id)); "
+            "create unique index quartos_id_uindex on quartos (id);";
+
     char *table_reservas =
-            "create table reservas ( id integer constraint reservas_pk primary key autoincrement, id_cliente integer \tconstraint reservas_clientes_id_fk references clientes, id_quarto integer constraint reservas_quartos_id_fk references quartos, inicio text, fim text ); create unique index reservas_id_uindex on reservas (id);\n";
+            "create table reservas ( id integer constraint reservas_pk primary key autoincrement, "
+            "id_cliente integer constraint reservas_clientes_id_fk references clientes, "
+            "id_quarto integer constraint reservas_quartos_id_fk references quartos, "
+            "inicio text, fim text ); "
+            "create unique index reservas_id_uindex on reservas (id);\n";
+
+    char *table_reservas_inativas =
+            "create table reservas_inativas( id integer constraint reservas_inativas_pk primary key autoincrement, "
+            "id_cliente integer constraint reservas_inativas_clientes_id_fk references clientes, "
+            "id_quarto integer constraint reservas_inativas_quartos_id_fk references quartos, "
+            "inicio text, fim text ); "
+            "create unique index reservas_inativas_id_uindex on reservas_inativas (id);\n";
 
     int created;
 
     if (sqlite3_exec(db, table_clientes, NULL, NULL, &error_msg) == SQLITE_OK &&
         sqlite3_exec(db, table_quartos, NULL, NULL, &error_msg1) == SQLITE_OK &&
-        sqlite3_exec(db, table_reservas, NULL, NULL, &error_msg2) == SQLITE_OK) {
-        gerar_dados(db);
+        sqlite3_exec(db, table_reservas, NULL, NULL, &error_msg2) == SQLITE_OK &&
+        sqlite3_exec(db, table_reservas_inativas, NULL, NULL, &error_msg2) == SQLITE_OK) {
         created = 1;
     } else {
         created = 0;
@@ -99,6 +122,7 @@ int criar_banco() {
 
     sqlite3_close(db);
 
+    gerar_dados(db);
     return created;
 }
 
@@ -114,7 +138,6 @@ int inserir_cliente(CLIENTE *c) {
     puts(query);
     char *erro = executar_query(query, NULL, NULL);
     if (erro)puts(erro);
-    else puts("succes");
     free(query);
     return 0;
 }
@@ -136,12 +159,12 @@ int listar_clientes(char *column, char *filter, int limit, int (*callback)(void 
     char char_limit[3];
     snprintf(char_limit, 3, "%d", limit);
 
-    strcpy(query, "select *  from clientes");
+    strcpy(query, "select * from clientes ");
 
     if (strcmp(column, "NULL") != 0) {
-        strcat(query, "where ");
+        strcat(query, " where ");
 
-        if (strcmp(column, "id") == 0) {
+        if (strcmp(column, " id ") == 0) {
             strcat(query, column);
             strcat(query, " = ");
             strcat(query, filter);
@@ -159,6 +182,7 @@ int listar_clientes(char *column, char *filter, int limit, int (*callback)(void 
     }
 
     strcat(query, ";");
+    puts(query);
     executar_query(query, callback, NULL);
 
     free(query);
@@ -252,7 +276,7 @@ int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2) {
     return 0;
 }
 
-int qtd_clientes() {
+int get_qtd_clientes() {
     int total;
     char *query = (char *) malloc(sizeof(char) * 150);
 
@@ -264,7 +288,7 @@ int qtd_clientes() {
     return total;
 }
 
-int qtd_reservas() {
+int get_qtd_reservas() {
     int total;
     char *query = (char *) malloc(sizeof(char) * 150);
     strcpy(query, "select count(id) from reservas;");
@@ -292,6 +316,24 @@ int remover_cliente(char *column, char *filter) {
 
     strcat(query, ";");
     executar_query(query, mostrar_resultados, NULL);
+
+    free(query);
+
+    return 0;
+}
+
+int remover_reserva(char *column, char *filter) {
+    char *query = (char *) malloc(sizeof(char) * 150);
+
+    strcpy(query, "insert into reservas_inativas select * from reservas where id = ");
+    strcat(query, filter);
+    strcat(query, " ;");
+    executar_query(query, NULL, NULL);
+
+    strcpy(query, "delete from reservas where id = ");
+    strcat(query, filter);
+    strcat(query, " ;");
+    executar_query(query, NULL, NULL);
 
     free(query);
 

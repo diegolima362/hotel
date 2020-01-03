@@ -68,10 +68,12 @@ CLIENTE *recuperar_clientes(CLIENTE *c, char *id);
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2);
 
-int qtd_clientes();
+int get_qtd_clientes();
 
-int qtd_reservas();
+int get_qtd_reservas();
 
 int remover_cliente(char *column, char *filter);
+
+int remover_reserva(char *column, char *filter);
 
 int inserir_reserva(RESERVA *r);

@@ -6,9 +6,10 @@
 #include "libs/login.h"
 #include "libs/datas.h"
 #include "libs/database.h"
-#include "libs/sqlite/sqlite3.h"
 
-void checar_diretorios();
+int criar_banco_de_dados();
+
+int checar_diretorios();
 
 int autenticar();
 
@@ -21,6 +22,14 @@ void menu_principal();
 void mostrar_data();
 
 void menu_reservas();
+
+void buscar_cliente_cpf();
+
+void buscar_cliente_nome();
+
+void buscar_cliente();
+
+void menu_buscas();
 
 void menu_dados();
 
@@ -41,13 +50,20 @@ void listar_todos_clientes();
 int mostrar_cliente_recuperado(CLIENTE *c);
 
 int main(int argc, char *argv[]) {
-    checar_diretorios();
-//    if (autenticar()) {
+
+    if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
+        printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
+        exit(0);
+    }
 //
+//    if (autenticar()) {
 //        menu_principal();
-//   }
-    listar_todos_clientes();
-    puts("\nFIM");
+//    }
+
+    buscar_cliente_nome();
+    pausa();
+    buscar_cliente_cpf();
+//    remover_reserva(NULL, "2");
     pausa();
     return 0;
 }
@@ -90,17 +106,20 @@ void menu_principal() {
 
         switch (opcao) {
             case 1:
+                limpar_tela();
                 menu_reservas();
                 break;
             case 2:
+                limpar_tela();
                 menu_dados();
                 break;
             case 3:
+                limpar_tela();
                 menu_configuracao();
                 break;
             case 0:
                 limpar_tela();
-                printf("SAINDO...");
+                printf("SAINDO...\n\n");
                 exit(0);
 
             default:
@@ -156,6 +175,10 @@ void menu_configuracao() {
 
 }
 
+void exibir_qtd_reservas() {
+
+}
+
 void menu_dados() {
     int opcao;
     do {
@@ -171,6 +194,7 @@ void menu_dados() {
 
         switch (opcao) {
             case 1:
+                exibir_qtd_reservas();
                 break;
             case 2:
                 break;
@@ -190,9 +214,95 @@ void menu_dados() {
     } while (opcao != 0);
 }
 
+void buscar_cliente_cpf() {
+    char cpf[15];
+    limpar_tela();
+    printf("INSIRA O CPF (SOMENTE NUMEROS): ");
+    limpar_teclado();
+    fgets(cpf, 12, stdin);
+    remover_quebra(cpf);
+    listar_clientes("cpf", cpf, -1, mostrar_cliente);
+
+}
+
+void buscar_cliente_nome() {
+    char nome[51];
+    limpar_tela();
+    printf("INSIRA O NOME: ");
+    limpar_teclado();
+    fgets(nome, 51, stdin);
+    remover_quebra(nome);
+    listar_clientes("nome", nome, -1, mostrar_cliente);
+
+}
+
+void buscar_cliente() {
+    int opcao;
+    do {
+        limpar_tela();
+        mostrar_titulo();
+        printf("\n\tBUSCAR CLIENTE\n\n");
+        printf("\t\t(1) BUSCAR POR NOME\n");
+        printf("\t\t  (2) BUSCAR POR CPF\n");
+        printf("\n\t\t(0) VOLTAR\n");
+        printf("\n\t\tOPÇÃO: ");
+        scanf(" %d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                buscar_cliente_nome();
+                break;
+            case 2:
+                break;
+            case 0:
+                return;
+            default:
+                printf("\n\nOPCAO INVALIDA!\n\n");
+                pausa();
+                break;
+        }
+    } while (opcao != 0);
+}
+
+void menu_buscas() {
+    int opcao;
+    do {
+        limpar_tela();
+        mostrar_titulo();
+        printf("\n\tBUSCAR\n\n");
+        printf("\t\t(1) BUSCAR CLIENTE\n");
+        printf("\t\t  (2) BUSCAR RESERVA\n");
+        printf("\n\t\t(0) VOLTAR\n");
+        printf("\n\t\tOPÇÃO: ");
+        scanf(" %d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                buscar_cliente();
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                limpar_tela();
+                menu_buscas();
+                break;
+            case 0:
+                return;
+            default:
+                printf("\n\nOPCAO INVALIDA!\n\n");
+                pausa();
+                break;
+        }
+    } while (opcao != 0);
+}
+
 void menu_reservas() {
     int opcao;
     do {
+        limpar_tela();
+        mostrar_titulo();
         printf("\n\tRESERVAS\n\n");
         printf("\t\t(1) NOVA RESERVA\n");
         printf("\t\t  (2) EDITAR RESERVA\n");
@@ -211,6 +321,8 @@ void menu_reservas() {
             case 3:
                 break;
             case 4:
+                limpar_tela();
+                menu_buscas();
                 break;
             case 0:
                 return;
@@ -307,26 +419,33 @@ void mostrar_reserva(RESERVA *r, CLIENTE *c) {
     puts("\t-----------------------------------------------------------------------------------\n");
 }
 
-void checar_diretorios() {
-    FILE *ativo = fopen("data/usr/.ativo", "r+b");
-
-    if (ativo == NULL) {
-        mkdir("data/", 0700);
-        mkdir("data/usr/", 0700);
-
-        ativo = fopen("data/usr/.ativo", "w+b");
-    }
-
-    fclose(ativo);
-
+int criar_banco_de_dados() {
     FILE *db = fopen(DB_PATH, "r+b");
+    int criacao__banco_dados = 0;
 
     if (db == NULL) {
         db = fopen(DB_PATH, "w+b");
         fclose(db);
+        printf("\n\n\t\tCRIANDO BANCO DE DADOS ... \n");
         criar_banco();
+        criacao__banco_dados = 1;
     } else { fclose(db); }
 
+    return criacao__banco_dados;
+}
+
+int checar_diretorios() {
+    FILE *ativo = fopen("data/usr/.ativo", "r+b");
+    int criacao_de_diretorios = 0;
+
+    if (ativo == NULL) {
+        mkdir("data/", 0700);
+        mkdir("data/usr/", 0700);
+        ativo = fopen("data/usr/.ativo", "w+b");
+        criacao_de_diretorios = 1;
+    }
+    fclose(ativo);
+    return criacao_de_diretorios;
 }
 
 int autenticar() {
@@ -335,7 +454,8 @@ int autenticar() {
     if (existe_usuario_cadastrado() == 0) {
         criar_login(login);
     }
-
+    limpar_tela();
+    printf("\n\t\tINSIRA O LOGIN E SENHA\n\n");
     tela_pegar_login(login);
 
     int status = validar_login(login);
@@ -348,10 +468,10 @@ int criar_login(LOGIN *login) {
 
     char senha_confirmacao[21];
 
-    printf("CRIAR LOGIN\n");
+    printf("\n\n\n\tCADASTRAR ADMIN: ");
     tela_pegar_login(login);
 
-    printf("DIGITAR SENHA NOVAMENTE: ");
+    printf("\n\n\n\tINSIRA A SENHA NOVAMENTE: ");
     fgets(senha_confirmacao, 21, stdin);
     remover_quebra(senha_confirmacao);
 
@@ -362,7 +482,8 @@ int criar_login(LOGIN *login) {
             return 0;
         }
     } else {
-        printf("SENHAS INCOMPATIVEIS\n");
+        printf("\n\n\t\t\tSENHAS INCOMPATIVEIS !!!\n");
+        pausa();
         return criar_login(login);
     }
 }
@@ -375,7 +496,6 @@ void alterar_login() {
 }
 
 void tela_pegar_login(LOGIN *login) {
-    limpar_tela();
     printf("\n\n\n\t\t\tUSUARIO: ");
     limpar_teclado();
     fgets(login->usr, 21, stdin);
