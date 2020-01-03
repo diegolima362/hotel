@@ -19,9 +19,15 @@ void tela_pegar_login(LOGIN *login);
 
 void menu_principal();
 
-void mostrar_data();
+void mostrar_hora(struct tm *hora);
+
+void mostrar_data(struct tm *date);
 
 void menu_reservas();
+
+void selecionar_quarto();
+
+void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final);
 
 void buscar_cliente_cpf();
 
@@ -43,6 +49,8 @@ void nova_reserva();
 
 void pegar_dados_cliente(CLIENTE *c);
 
+int mostrar_quartos_disponiveis(void *ptr, int resultados, char **STR1, char **STR2);
+
 int mostrar_cliente(void *ptr, int resultados, char **STR1, char **STR2);
 
 void listar_todos_clientes();
@@ -51,19 +59,24 @@ int mostrar_cliente_recuperado(CLIENTE *c);
 
 int main(int argc, char *argv[]) {
 
-    if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
-        printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
-        exit(0);
-    }
+//    if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
+//        printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
+//        exit(0);
+//    }
 //
 //    if (autenticar()) {
 //        menu_principal();
 //    }
 
-    buscar_cliente_nome();
-    pausa();
-    buscar_cliente_cpf();
-//    remover_reserva(NULL, "2");
+//    nova_reserva();
+
+    char inicio[15], fim[15], tipo[2];
+    strcpy(inicio, "2020-01-15");
+    strcpy(fim, "2020-01-20");
+    strcpy(tipo, "7");
+    printf("\n\t\t%6s%7s%11s%10s", "NUM", "TIPO", "DESCRICAO", "VALOR");
+    listar_quartos_disponiveis(inicio, fim, tipo, mostrar_quartos_disponiveis);
+
     pausa();
     return 0;
 }
@@ -77,15 +90,40 @@ int imprimir_resultados(void *ptr, int resultados, char **STR1, char **STR2) {
     return 0;
 }
 
-void mostrar_data() {
-    DATE *date = ler_data();
-    printf("%02d/%02d/%04d ", date->tm_mday, date->tm_mon + 1, date->tm_year + 1900);
-    printf("%02d:%02d", date->tm_hour, date->tm_min);
+void mostrar_hora(struct tm *hora) {
+    struct tm *data;
+
+    if (hora == NULL) {
+        data = ler_data();
+    } else {
+        data = hora;
+    }
+
+    printf("%02d:%02d", data->tm_hour, data->tm_min);
+}
+
+void mostrar_data(struct tm *date) {
+    struct tm *data;
+
+    if (date == NULL) {
+        data = ler_data();
+        data->tm_mon += 1;
+        data->tm_year += 1900;
+    } else {
+        data = date;
+    }
+
+    printf("%02d/%02d/%04d ", data->tm_mday, data->tm_mon, data->tm_year);
+}
+
+void mostrar_data_hora() {
+    mostrar_data(NULL);
+    mostrar_hora(NULL);
 }
 
 void mostrar_titulo() {
     printf("\n\n\t\t---- CAMPINA  COMFORT  PREMIUM ----\n\t\t\t  ");
-    mostrar_data();
+    mostrar_data_hora();
 }
 
 void menu_principal() {
@@ -334,10 +372,42 @@ void menu_reservas() {
     } while (opcao != 0);
 }
 
+void selecionar_quarto() {
+    limpar_tela();
+    mostrar_titulo();
+
+}
+
+void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final) {
+    printf("\n\n\t\tDATA DE ENTRADA (EX.: DD-MM-AAAA): ");
+    scanf(" %d %d %d", &data_inicio->tm_mday, &data_inicio->tm_mon, &data_inicio->tm_year);
+
+    printf("\n\t\tDATA DE SAIDA (EX.: DD-MM-AAAA): ");
+    scanf(" %d %d %d", &data_final->tm_mday, &data_final->tm_mon, &data_final->tm_year);
+
+}
+
 void nova_reserva() {
+    RESERVA r;
+
     CLIENTE c;
-    pegar_dados_cliente(&c);
-    inserir_cliente(&c);
+
+    limpar_tela();
+    mostrar_titulo();
+    printf("\n\n\n\t\tPERIODO DE HOSPEDAGEM\n\n");
+//    inserir_data_reserva(&r.inicio, &r.fim);
+    char str[15];
+    strcpy(str, "2020-12-01");
+
+//    puts(formatar_data_sql(&r.inicio, str));
+    formatar_data_struct(&r.inicio, str);
+    mostrar_data(&r.inicio);
+
+//    selecionar_quarto();
+
+
+//    pegar_dados_cliente(&c);
+//    inserir_cliente(&c);
 }
 
 void listar_todos_clientes() {
@@ -346,6 +416,11 @@ void listar_todos_clientes() {
     puts("\n\n\tCLIENTES REGISTRADOS");
     printf("\n\t\t%3s%20s%20s", "ID", "NOME", "CPF");
     listar_clientes(str_null, str_null, -1, mostrar_cliente);
+}
+
+int mostrar_quartos_disponiveis(void *ptr, int resultados, char **STR1, char **STR2) {
+    printf("\n\t\t%5s%5s%15s   $%3s", STR1[0], STR1[1], STR1[2], STR1[3]);
+    return 0;
 }
 
 int mostrar_cliente(void *ptr, int resultados, char **STR1, char **STR2) {
@@ -378,10 +453,11 @@ void pegar_dados_cliente(CLIENTE *c) {
     limpar_teclado();
     fgets(c->phone, 20, stdin);
     remover_quebra(c->phone);
-    printf("\t\tCARTAO DE CREDITO: ");
-    limpar_teclado();
-    fgets(c->cred_card, 21, stdin);
-    remover_quebra(c->cred_card);
+
+//    printf("\t\tCARTAO DE CREDITO: ");
+//    limpar_teclado();
+//    fgets(c->cred_card, 21, stdin);
+//    remover_quebra(c->cred_card);
 
 //    puts("\n\t\t\t>>> INSERIR ENDERECO \n");
 //    printf("\n\t\tRUA: ");

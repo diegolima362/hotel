@@ -44,8 +44,8 @@ typedef struct reserva {
     int status;
     int id_cliente;
     int id_quarto;
-    time_t inicio;
-    time_t fim;
+    struct tm inicio;
+    struct tm fim;
 } RESERVA;
 
 char *executar_query(char *query, int (*callback)(void *, int, char **, char **), void *ptr);
@@ -59,6 +59,8 @@ int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2);
 int listar_clientes(char *column, char *filter, int limit, int (*callback)(void *, int, char **, char **));
 
 int listar_reservas(char *column, char *filter, int limit);
+
+int listar_quartos_disponiveis(char *inicio, char *fim, char *tipo, int (*callback)(void *, int, char **, char **));
 
 int listar_quartos(char *column, char *filter, int limit);
 
