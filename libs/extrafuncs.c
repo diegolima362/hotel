@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 void pausa() {
+    printf("\n\t\t<ENTER> PARA CONTINUAR");
     getchar();
     getchar();
 }
@@ -33,4 +34,9 @@ void limpar_teclado() {
 
 void limpar_tela() {
     system("clear");
+}
+
+int is_in(int valor, const int *array, int tamanho) {
+    for (int i = 0; i < tamanho; i++) if (array[i] == valor) return 1;
+    return 0;
 }

@@ -30,6 +30,8 @@ typedef struct end {
 
 typedef struct cliente {
     int id;
+    int id_reserva;
+    int id_quarto;
     char nome[31];
     char sobrenome[31];
     char cpf[15];
@@ -48,21 +50,24 @@ typedef struct reserva {
     struct tm fim;
 } RESERVA;
 
-char *executar_query(char *query, int (*callback)(void *, int, char **, char **), void *ptr);
+int retorno(void *ptr, int resultados, char **STR1, char **STR2);
+
+void teste_int();
+
+char *executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr);
 
 int criar_banco();
 
-int inserir_cliente(CLIENTE *c);
-
 int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2);
 
-int listar_clientes(char *column, char *filter, int limit, int (*callback)(void *, int, char **, char **));
+int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado,
+                            int (*callback)(void *, int, char **, char **), int *index);
 
-int listar_reservas(char *column, char *filter, int limit);
+int listar_clientes(char *column, char *filter, int limit, void *ptr, int(*callback)(void *, int, char **, char **));
 
-int listar_quartos_disponiveis(char *inicio, char *fim, char *tipo, int (*callback)(void *, int, char **, char **));
+int listar_reservas(char *column, char *filter, int limit, void *ptr, int(*callback)(void *, int, char **, char **));
 
-int listar_quartos(char *column, char *filter, int limit);
+int listar_quartos(char *column, char *filter, int limit, void *ptr, int(*callback)(void *, int, char **, char **));
 
 int montar_cliente(void *ptr, int resultados, char **STR1, char **STR2);
 
@@ -70,12 +75,18 @@ CLIENTE *recuperar_clientes(CLIENTE *c, char *id);
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2);
 
-int get_qtd_clientes();
-
 int get_qtd_reservas();
 
 int remover_cliente(char *column, char *filter);
 
 int remover_reserva(char *column, char *filter);
 
-int inserir_reserva(RESERVA *r);
+int registrar_cliente(CLIENTE *c);
+
+int reservar_quarto(int id_quarto, int id_reserva);
+
+int registrar_reserva(RESERVA *r);
+
+int gerar_id(char *tabela, int *id);
+
+int get_id_cliente();

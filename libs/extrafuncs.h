@@ -34,5 +34,5 @@ void upper(char *str);
  */
 void remover_quebra(char *str);
 
-
+int is_in(int valor, const int*array, int tamanho);
 
