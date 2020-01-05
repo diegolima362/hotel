@@ -8,6 +8,58 @@
 #include "libs/browserdb.h"
 #include "libs/database.h"
 
+int imprimir_resultados(void *ptr, int resultados, char **STR1, char **STR2);
+
+void mostrar_hora(struct tm *hora);
+
+void mostrar_data(struct tm *date);
+
+void mostrar_data_hora();
+
+void mostrar_titulo();
+
+void menu_principal();
+
+void menu_configuracao();
+
+void exibir_qtd_reservas();
+
+void menu_dados();
+
+int busca_cliente(char *coluna, char *valor, int *ids);
+
+int busca_reserva(char *coluna, char *valor, int *ids);
+
+int busca_quarto(char *coluna, char *valor, int *ids);
+
+char *pegar_dado_pesquisa(char *valor, int size);
+
+void buscar_reserva();
+
+void buscar_cliente();
+
+void menu_buscas();
+
+void menu_reservas();
+
+int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, int tipo, int *index);
+
+int selecionar_quarto(struct tm *data_inicio, struct tm *data_final, int *id_quarto);
+
+int selecionar_tipo_quarto();
+
+void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final);
+
+void nova_reserva();
+
+void listar_todos_clientes();
+
+int mostrar_cliente_recuperado(CLIENTE *c);
+
+void pegar_dados_cliente(CLIENTE *c);
+
+void mostrar_reserva(RESERVA *r, CLIENTE *c);
+
 int criar_banco_de_dados();
 
 int checar_diretorios();
@@ -16,47 +68,9 @@ int autenticar();
 
 int criar_login(LOGIN *login);
 
-void tela_pegar_login(LOGIN *login);
-
-void menu_principal();
-
-void mostrar_hora(struct tm *hora);
-
-void mostrar_data(struct tm *date);
-
-void menu_reservas();
-
-int selecionar_quarto(struct tm *data_inicio, struct tm *data_final, int *id_quarto);
-
-void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final);
-
-void buscar_cliente_cpf();
-
-void buscar_cliente_nome();
-
-void buscar_cliente();
-
-void menu_buscas();
-
-void menu_dados();
-
-void menu_configuracao();
-
-void mostrar_titulo();
-
 void alterar_login();
 
-void nova_reserva();
-
-int selecionar_tipo_quarto();
-
-void pegar_dados_cliente(CLIENTE *c);
-
-int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, int tipo, int *index);
-
-void listar_todos_clientes();
-
-int mostrar_cliente_recuperado(CLIENTE *c);
+void tela_pegar_login(LOGIN *login);
 
 int main(int argc, char *argv[]) {
 
@@ -68,11 +82,12 @@ int main(int argc, char *argv[]) {
 //    if (autenticar()) {
 //        menu_principal();
 //    }
+    int ids[100] = {0};
+    int qtd = busca_cliente("id_quarto", "85", ids);
 
-    nova_reserva();
-//    teste_int();
-
-    pausa();
+    printf("\nqtd: %d\n\n", qtd);
+    for (int i = 0; ids[i] != 0; i++)
+        printf(" %d ", ids[i]);
     return 0;
 }
 
@@ -245,44 +260,104 @@ void menu_dados() {
     } while (opcao != 0);
 }
 
-void buscar_cliente_cpf() {
-    char cpf[15];
-    limpar_tela();
-    printf("INSIRA O CPF (SOMENTE NUMEROS): ");
-    limpar_teclado();
-    fgets(cpf, 12, stdin);
-    remover_quebra(cpf);
-    listar_clientes("cpf", cpf, -1, exibir_cliente, NULL);
-
+int busca_cliente(char *coluna, char *valor, int *ids) {
+    int qtd_resultados;
+    qtd_resultados = listar_clientes(coluna, valor, -1, ids, exibir_resultados);
+    return qtd_resultados;
 }
 
-void buscar_cliente_nome() {
-    char nome[51];
-    limpar_tela();
-    printf("INSIRA O NOME: ");
-    limpar_teclado();
-    fgets(nome, 51, stdin);
-    remover_quebra(nome);
-    listar_clientes("nome", nome, -1, exibir_cliente, NULL);
+int busca_reserva(char *coluna, char *valor, int *ids) {
+    int qtd_resultados;
+    qtd_resultados = listar_clientes(coluna, valor, -1, ids, exibir_resultados);
+    return qtd_resultados;
 }
 
-void buscar_cliente() {
+int busca_quarto(char *coluna, char *valor, int *ids) {
+    int qtd_resultados;
+    qtd_resultados = listar_clientes(coluna, valor, -1, ids, exibir_resultados);
+    return qtd_resultados;
+}
+
+char *pegar_dado_pesquisa(char *valor, int size) {
+    limpar_teclado();
+    fgets(valor, size, stdin);
+    remover_quebra(valor);
+    return valor;
+}
+
+void buscar_reserva() {
     int opcao;
+
+    char dados_busca[50];
+
     do {
         limpar_tela();
         mostrar_titulo();
-        printf("\n\tBUSCAR CLIENTE\n\n");
-        printf("\t\t(1) BUSCAR POR NOME\n");
-        printf("\t\t  (2) BUSCAR POR CPF\n");
+        printf("\n\tBUSCAR RESERVA\n\n");
+        printf("\t\t(1) BUSCAR POR CLIENTE DA RESERVA\n");
+        printf("\t\t  (2) BUSCAR POR QUARTO DA RESERVA\n");
+        printf("\t\t    (3) BUSCAR POR DATA DA RESERVA\n");
+        printf("\t\t      (4) BUSCAR POR ID DA RESERVA\n");
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPÇÃO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
             case 1:
-                buscar_cliente_nome();
+                printf("\n\t\tINSIRA O NOME: ");
+                pegar_dado_pesquisa(dados_busca, 50);
+                busca_cliente("NOME", dados_busca, NULL);
                 break;
             case 2:
+                printf("\n\t\tINSIRA O CPF: ");
+                pegar_dado_pesquisa(dados_busca, 50);
+                busca_cliente("NOME", dados_busca, NULL);
+                break;
+            case 3:
+                printf("\n\t\tINSIRA O ID: ");
+                pegar_dado_pesquisa(dados_busca, 50);
+                busca_cliente("NOME", dados_busca, NULL);
+                break;
+            case 0:
+                return;
+            default:
+                printf("\n\nOPCAO INVALIDA!\n\n");
+                pausa();
+                break;
+        }
+    } while (opcao != 0);
+}
+
+void buscar_cliente() {
+    int opcao;
+    char dado_busca[50];
+
+    do {
+        limpar_tela();
+        mostrar_titulo();
+        printf("\n\tBUSCAR CLIENTE\n\n");
+        printf("\t\t(1) BUSCAR POR NOME\n");
+        printf("\t\t  (2) BUSCAR POR CPF\n");
+        printf("\t\t    (3) BUSCAR POR ID\n");
+        printf("\n\t\t(0) VOLTAR\n");
+        printf("\n\t\tOPÇÃO: ");
+        scanf(" %d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("\n\t\tINSIRA O NOME: ");
+                pegar_dado_pesquisa(dado_busca, 50);
+                busca_cliente("nome", dado_busca, NULL);
+                break;
+            case 2:
+                printf("\n\t\tINSIRA O CPF: ");
+                pegar_dado_pesquisa(dado_busca, 50);
+                busca_cliente("cpf", dado_busca, NULL);
+                break;
+            case 3:
+                printf("\n\t\tINSIRA O ID: ");
+                pegar_dado_pesquisa(dado_busca, 50);
+                busca_cliente("id", dado_busca, NULL);
                 break;
             case 0:
                 return;
@@ -373,7 +448,7 @@ int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, i
 
     printf("\n\t\t%6s%7s%11s%12s", "NUM", "TIPO", "DESCRICAO", "VALOR");
 
-    listar_quartos_ocupados(inicio, fim, tipo_quarto, 0, exibir_quarto, index);
+    listar_quartos_ocupados(inicio, fim, tipo_quarto, 0, index, exibir_resultados);
 
     return 0;
 }
@@ -485,7 +560,7 @@ void listar_todos_clientes() {
     mostrar_titulo();
     puts("\n\n\tCLIENTES REGISTRADOS");
     printf("\n\t\t%3s%20s%20s", "ID", "NOME", "CPF");
-    listar_clientes(str_null, str_null, -1, exibir_cliente, NULL);
+    listar_clientes(str_null, str_null, -1, NULL, exibir_resultados);
 }
 
 

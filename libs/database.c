@@ -140,8 +140,8 @@ int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2) {
     return 0;
 }
 
-int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado,
-                            int (*callback)(void *, int, char **, char **), int *index) {
+int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado, int *ids,
+                            int (*callback)(void *, int, char **, char **)) {
 
     char *sql = (char *) malloc(sizeof(char) * 350);
     strcpy(sql, "SELECT q.id, q.tipo, q.descricao, q.valor FROM quartos q WHERE ");
@@ -172,13 +172,13 @@ int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado,
     strcat(sql, fim);
     strcat(sql, "' >= inicio));");
 
-    executar_sql(sql, callback, index);
+    executar_sql(sql, callback, ids);
     free(sql);
 
     return 0;
 }
 
-int listar_clientes(char *column, char *filter, int limit, void *ptr, int (*callback)(void *, int, char **, char **)) {
+int listar_clientes(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
     char *sql = (char *) malloc(sizeof(char) * 150);
     char char_limit[3];
     snprintf(char_limit, 3, "%d", limit);
@@ -187,15 +187,15 @@ int listar_clientes(char *column, char *filter, int limit, void *ptr, int (*call
     if (strcmp(column, "NULL") != 0) {
         strcat(sql, " where ");
 
-        if (strcmp(column, " id ") == 0) {
+        if (strcmp(column, " id ") == 0 || strcmp(column, " id_quarto ") == 0 || strcmp(column, " id_reserva ") == 0) {
             strcat(sql, column);
             strcat(sql, " = ");
             strcat(sql, filter);
         } else {
             strcat(sql, column);
-            strcat(sql, " like '");
+            strcat(sql, " like '%");
             strcat(sql, filter);
-            strcat(sql, "' ");
+            strcat(sql, "%' ");
         }
     }
 
@@ -205,14 +205,14 @@ int listar_clientes(char *column, char *filter, int limit, void *ptr, int (*call
     }
 
     strcat(sql, ";");
-    executar_sql(sql, callback, NULL);
+    executar_sql(sql, callback, ids);
 
     free(sql);
 
-    return 0;
+    return ids != NULL ? ((int *) ids)[0] : -1;
 }
 
-int listar_reservas(char *column, char *filter, int limit, void *ptr, int (*callback)(void *, int, char **, char **)) {
+int listar_reservas(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
     char *sql = (char *) malloc(sizeof(char) * 150);
     char char_limit[3];
     snprintf(char_limit, 3, "%d", limit);
@@ -236,14 +236,14 @@ int listar_reservas(char *column, char *filter, int limit, void *ptr, int (*call
     }
 
     strcat(sql, ";");
-    executar_sql(sql, mostrar_resultados, NULL);
+    executar_sql(sql, mostrar_resultados, ids);
 
     free(sql);
 
-    return 0;
+    return ids != NULL ? ((int *) ids)[0] : -1;
 }
 
-int listar_quartos(char *column, char *filter, int limit, void *ptr, int (*callback)(void *, int, char **, char **)) {
+int listar_quartos(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
     char *sql = (char *) malloc(sizeof(char) * 150);
     char char_limit[3];
     snprintf(char_limit, 3, "%d", limit);

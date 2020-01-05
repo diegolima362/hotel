@@ -15,11 +15,17 @@ void pausa() {
     getchar();
 }
 
-void upper(char *str) {
-    while (*str) {
-        *str = toupper(*str);
-        str++;
-    }
+char ctoup(char c) {
+    if (c >= 'a' && c <= 'z')
+        return (int) c - 32;
+    else return c;
+}
+
+char *upper(char *str) {
+    for (int i = 0; str[i] != '\0'; i++)
+        str[i] = toupper(str[i]);
+
+    return str;
 }
 
 void remover_quebra(char *str) {

@@ -7,8 +7,5 @@
 
 #endif //HOTEL_BROWSERDB_H
 
-int exibir_quarto(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
-
-int exibir_cliente(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
-
-int exibir_reserva(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
+void extrair(void *ptr, char *valor_na_coluna);
+int exibir_resultados(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);

@@ -26,7 +26,7 @@ void limpar_teclado();
  * retorna a string toda em maiuscula
  * @param str string para fazer uppercase
  */
-void upper(char *str);
+char * upper(char *str);
 
 /**
  * remover quebra de linha de uma string

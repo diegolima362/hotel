@@ -15,9 +15,9 @@ typedef struct {
     char pwd[21];
 } LOGIN;
 
-int validar_login(LOGIN *login_comparacao);
-
 int existe_usuario_cadastrado();
+
+int validar_login(LOGIN *login_comparacao);
 
 void pegar_dados_arquivo_login(LOGIN *login);
 
