@@ -87,7 +87,7 @@ int criar_banco() {
 
     char *table_quartos = "create table quartos ( "
                           "id integer constraint quarto_pk primary key autoincrement, tipo integer, "
-                          "descricao char(15), valor real"
+                          "descricao char(15), valor real);"
                           "create unique index quartos_id_uindex on quartos (id);";
 
     char *table_quartos_reservados = "create table quartos_reservados( "
@@ -204,10 +204,16 @@ db_listar_clientes(char *column, char *filter, int limit, void *ids, int (*callb
             strcat(sql, " = ");
             strcat(sql, filter);
         } else {
-            strcat(sql, column);
-            strcat(sql, " like '%");
-            strcat(sql, filter);
-            strcat(sql, "%' ");
+            if (strcmp(column, "fullname") == 0) {
+                strcat(sql, "nome || ' ' || sobrenome LIKE '%");
+                strcat(sql, filter);
+                strcat(sql, "%' ");
+            } else {
+                strcat(sql, column);
+                strcat(sql, " like '%");
+                strcat(sql, filter);
+                strcat(sql, "%' ");
+            }
         }
     }
 
@@ -225,7 +231,8 @@ db_listar_clientes(char *column, char *filter, int limit, void *ids, int (*callb
 }
 
 int
-db_listar_reservas(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
+db_listar_reservas(char *column, char *filter, int limit, void *ids,
+                   int (*callback)(void *, int, char **, char **)) {
     char *sql = (char *) malloc(sizeof(char) * 150);
     char char_limit[3];
     snprintf(char_limit, 3, "%d", limit);
@@ -257,7 +264,8 @@ db_listar_reservas(char *column, char *filter, int limit, void *ids, int (*callb
 }
 
 int
-db_listar_quartos(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
+db_listar_quartos(char *column, char *filter, int limit, void *ids,
+                  int (*callback)(void *, int, char **, char **)) {
     char *sql = (char *) malloc(sizeof(char) * 150);
     char char_limit[3];
     snprintf(char_limit, 3, "%d", limit);

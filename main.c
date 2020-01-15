@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 //        exibir_menu_principal();
 //    }
     int id[10] = {0};
-    int qtd = db_listar_clientes("id_quarto", "16", 10, id, exibir_resultados);
+    int qtd = db_listar_clientes("id_reserva", "1", 10, id, exibir_resultados);
 
     printf("\n\n resutados %d\n\n", qtd);
 

@@ -35,7 +35,7 @@ void montar_cliente_sql(char *str, CLIENTE *c);
 
 int busca_cliente(char *coluna, char *valor, int *ids);
 
-char *formatar_cliente(CLIENTE *c);
+char *formatar_cliente(CLIENTE *c, char *sql);
 
 void listar_todos_clientes();
 

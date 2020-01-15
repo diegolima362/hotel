@@ -27,10 +27,8 @@ int busca_cliente(char *coluna, char *valor, int *ids) {
     return qtd_resultados;
 }
 
-char *formatar_cliente(CLIENTE *c) {
+char *formatar_cliente(CLIENTE *c, char *sql) {
     char str[10];
-    char *sql = (char *) malloc(sizeof(char) * 150);
-
     strcpy(sql, "insert into clientes values (null, '");
     strcat(sql, c->nome);
     strcat(sql, "', '");
