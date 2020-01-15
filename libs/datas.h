@@ -7,8 +7,6 @@
 
 #endif //HOTEL_DATAS_H
 
-typedef struct tm DATE;
-
 /**
  * ler date e hora atual do sistema operacional
  *
@@ -67,3 +65,9 @@ int validar_data(struct tm *date);
  * @return 1: valido, 0:invalido
  */
 int validar_periodo(struct tm *data_inicio, struct tm *data_final);
+
+void mostrar_hora(struct tm *hora);
+
+void mostrar_data(struct tm *date);
+
+void mostrar_data_hora();

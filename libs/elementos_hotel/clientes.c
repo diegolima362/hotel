@@ -3,19 +3,21 @@
 //
 
 #include <stdio.h>
-#include "cliente.h"
+#include <stdlib.h>
+#include <string.h>
+
+#include "clientes.h"
 #include "../extrafuncs.h"
 #include "../database.h"
 #include "../browserdb.h"
 
-CLIENTE criar_novo_cliente(){
+CLIENTE criar_novo_cliente() {
     CLIENTE c;
     pegar_dados_cliente(&c);
-
     return c;
 }
 
-void montar_cliente_sql(char*str, CLIENTE* c){
+void montar_cliente_sql(char *str, CLIENTE *c) {
 
 }
 
@@ -23,6 +25,29 @@ int busca_cliente(char *coluna, char *valor, int *ids) {
     int qtd_resultados;
     qtd_resultados = db_listar_clientes(coluna, valor, -1, ids, exibir_resultados);
     return qtd_resultados;
+}
+
+char *formatar_cliente(CLIENTE *c) {
+    char str[10];
+    char *sql = (char *) malloc(sizeof(char) * 150);
+
+    strcpy(sql, "insert into clientes values (null, '");
+    strcat(sql, c->nome);
+    strcat(sql, "', '");
+    strcat(sql, c->sobrenome);
+    strcat(sql, "', '");
+    strcat(sql, c->cpf);
+    strcat(sql, "', '");
+    strcat(sql, c->phone);
+    strcat(sql, "', ");
+    snprintf(str, 10, "%d", c->id_quarto);
+    strcat(sql, str);
+    strcat(sql, ", ");
+    snprintf(str, 10, "%d", c->id_reserva);
+    strcat(sql, str);
+    strcat(sql, ");");
+
+    return sql;
 }
 
 void listar_todos_clientes() {

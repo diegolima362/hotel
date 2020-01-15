@@ -3,6 +3,15 @@
 //
 
 #include "reservas.h"
+#include "../datas.h"
+#include "../extrafuncs.h"
+#include "../database.h"
+#include "quartos.h"
+#include "../browserdb.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final) {
     do {
@@ -22,9 +31,11 @@ void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final) {
 
 }
 
-void nova_reserva() {
+void criar_nova_reserva(CLIENTE *c) {
     RESERVA r;
-    CLIENTE c;
+
+    if (c == NULL)
+        c = (CLIENTE *) malloc(sizeof(CLIENTE));
 
     char opcao[2];
 
@@ -42,17 +53,17 @@ void nova_reserva() {
         if (opcao[0] == 's' || opcao[0] == 'S') break;
     } while (1);
 
-    pegar_dados_cliente(&c);
+    pegar_dados_cliente(c);
 
-    gerar_id("clientes", &c.id);
+    gerar_id("clientes", &c->id);
     gerar_id("reservas", &r.id);
 
-    r.id_cliente = c.id;
-    c.id_reserva = r.id;
-    c.id_quarto = r.id_quarto;
+    r.id_cliente = c->id;
+    c->id_reserva = r.id;
+    c->id_quarto = r.id_quarto;
 
-    registrar_cliente(&c);
-    registrar_reserva(&r);
+
+    registrar_reserva(formatar_reserva(&r));
 }
 
 void mostrar_reserva(RESERVA *r, CLIENTE *c) {
@@ -66,8 +77,30 @@ void mostrar_reserva(RESERVA *r, CLIENTE *c) {
 
 int busca_reserva(char *coluna, char *valor, int *ids) {
     int qtd_resultados;
-    qtd_resultados = listar_clientes(coluna, valor, -1, ids, exibir_resultados);
+    qtd_resultados = db_listar_clientes(coluna, valor, -1, ids, exibir_resultados);
     return qtd_resultados;
+}
+
+char *formatar_reserva(RESERVA *r) {
+    char *sql = (char *) malloc(sizeof(char) * 200);
+    char str[100];
+
+    strcpy(sql, "insert into reservas values (null, ");
+    snprintf(str, 10, "%d", r->id_cliente);
+    strcat(sql, str);
+    strcat(sql, ", ");
+    snprintf(str, 10, "%d", r->id_quarto);
+    strcat(sql, str);
+    strcat(sql, ", '");
+    formatar_data_sql(&r->inicio, str);
+    strcat(sql, str);
+    formatar_data_sql(&r->fim, str);
+    strcat(sql, "', '");
+    strcat(sql, str);
+    strcat(sql, "');");
+
+    reservar_quarto(r->id_quarto, r->id);
+    return sql;
 }
 
 void exibir_qtd_reservas() {
@@ -94,17 +127,14 @@ void buscar_reserva() {
         switch (opcao) {
             case 1:
                 printf("\n\t\tINSIRA O NOME: ");
-                pegar_dado_pesquisa(dados_busca, 50);
                 busca_cliente("NOME", dados_busca, NULL);
                 break;
             case 2:
                 printf("\n\t\tINSIRA O CPF: ");
-                pegar_dado_pesquisa(dados_busca, 50);
                 busca_cliente("NOME", dados_busca, NULL);
                 break;
             case 3:
                 printf("\n\t\tINSIRA O ID: ");
-                pegar_dado_pesquisa(dados_busca, 50);
                 busca_cliente("NOME", dados_busca, NULL);
                 break;
             case 0:

@@ -36,3 +36,4 @@ void remover_quebra(char *str);
 
 int is_in(int valor, const int*array, int tamanho);
 
+void mostrar_titulo();

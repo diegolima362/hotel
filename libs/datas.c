@@ -106,3 +106,32 @@ int validar_periodo(struct tm *data_inicio, struct tm *data_final) {
 
     return comparar_data(data_inicio, data_final) > 0 ? 0 : 1;
 }
+
+void mostrar_hora(struct tm *hora) {
+    struct tm t;
+
+    if (hora == NULL) {
+        t = ler_data();
+    } else {
+        t = *hora;
+    }
+
+    printf("%02d:%02d", t.tm_hour, t.tm_min);
+}
+
+void mostrar_data(struct tm *date) {
+    struct tm t;
+
+    if (date == NULL) {
+        t = ler_data();
+    } else {
+        t = *date;
+    }
+
+    printf("%02d/%02d/%04d ", t.tm_mday, t.tm_mon, t.tm_year);
+}
+
+void mostrar_data_hora() {
+    mostrar_data(NULL);
+    mostrar_hora(NULL);
+}

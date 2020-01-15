@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <sqlite3.h>
 
+int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr);
+
 int retorno(void *ptr, int resultados, char **STR1, char **STR2) {
     int index = ++((int *) ptr)[0];
     int value = 0;
@@ -36,8 +38,7 @@ void teste_int() {
         printf(" %d ", array[i]);
 }
 
-
-char *executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr) {
+int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr) {
     char *error_msg;
     sqlite3 *db;
 
@@ -47,7 +48,7 @@ char *executar_sql(char *sql, int (*callback)(void *, int, char **, char **), vo
         puts(error_msg);
     sqlite3_close(db);
 
-    return error_msg;
+    return ptr != NULL ? ((int *) ptr)[0] : 0;
 }
 
 void criar_quartos(int n, char *sql, sqlite3 *db) {
@@ -178,16 +179,27 @@ int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado, in
     return 0;
 }
 
-int listar_clientes(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
-    char *sql = (char *) malloc(sizeof(char) * 150);
-    char char_limit[3];
-    snprintf(char_limit, 3, "%d", limit);
-    strcpy(sql, "select * from clientes ");
+int
+db_listar_clientes(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
+    char *sql = (char *) malloc(sizeof(char) * 500);
+    char char_limit[5];
+
+    strcpy(sql, "SELECT count(id), group_concat(id,','),"
+                "group_concat(concat, "
+                "'\n\t\t-----------------------------------------------\n\t\t') as result "
+                "FROM ("
+                "SELECT id, 'ID: ' || id || '\n\t\t' || 'NOME: ' || nome || ' ' || sobrenome || '\n\t\t' ||"
+                "'CPF: ' || cpf || '\n\t\t' ||"
+                "'PHONE: ' || phone || '\n\t\t' ||"
+                "'ID RESERVA: ' || id_reserva || '\n\t\t' ||"
+                "'ID QUARTO: ' || id_quarto"
+                " as concat\n"
+                "         FROM clientes ");
 
     if (strcmp(column, "NULL") != 0) {
         strcat(sql, " where ");
 
-        if (strcmp(column, " id ") == 0 || strcmp(column, " id_quarto ") == 0 || strcmp(column, " id_reserva ") == 0) {
+        if (strcmp(column, "id") == 0 || strcmp(column, "id_quarto") == 0 || strcmp(column, "id_reserva") == 0) {
             strcat(sql, column);
             strcat(sql, " = ");
             strcat(sql, filter);
@@ -200,19 +212,20 @@ int listar_clientes(char *column, char *filter, int limit, void *ids, int (*call
     }
 
     if (limit > 0) {
+        snprintf(char_limit, 5, "%d", limit);
         strcat(sql, " limit ");
         strcat(sql, char_limit);
     }
 
-    strcat(sql, ";");
-    executar_sql(sql, callback, ids);
-
+    strcat(sql, ");");
+    int qtd_resultados = executar_sql(sql, callback, ids);
     free(sql);
 
-    return ids != NULL ? ((int *) ids)[0] : -1;
+    return qtd_resultados;
 }
 
-int listar_reservas(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
+int
+db_listar_reservas(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
     char *sql = (char *) malloc(sizeof(char) * 150);
     char char_limit[3];
     snprintf(char_limit, 3, "%d", limit);
@@ -243,7 +256,8 @@ int listar_reservas(char *column, char *filter, int limit, void *ids, int (*call
     return ids != NULL ? ((int *) ids)[0] : -1;
 }
 
-int listar_quartos(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
+int
+db_listar_quartos(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
     char *sql = (char *) malloc(sizeof(char) * 150);
     char char_limit[3];
     snprintf(char_limit, 3, "%d", limit);
@@ -271,26 +285,6 @@ int listar_quartos(char *column, char *filter, int limit, void *ids, int (*callb
 
     free(sql);
     return 0;
-}
-
-int montar_cliente(void *ptr, int resultados, char **STR1, char **STR2) {
-    ((CLIENTE *) ptr)->id = (int) strtol(STR1[0], NULL, 10);
-    strcpy(((CLIENTE *) ptr)->nome, STR1[1]);
-    strcpy(((CLIENTE *) ptr)->cpf, STR1[2]);
-
-    return 0;
-}
-
-CLIENTE *recuperar_clientes(CLIENTE *c, char *id) {
-    char *error_msg;
-    char *sql = (char *) malloc(sizeof(char) * 150);
-    strcpy(sql, "select * from clientes where id = ");
-    strcat(sql, id);
-    executar_sql(sql, montar_cliente, c);
-    free(sql);
-
-    return c;
-
 }
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2) {
@@ -362,31 +356,8 @@ int remover_reserva(char *column, char *filter) {
     return 0;
 }
 
-int registrar_cliente(CLIENTE *c) {
-    char str[10];
-    char *sql = (char *) malloc(sizeof(char) * 150);
-
-    strcpy(sql, "insert into clientes values (null, '");
-    strcat(sql, c->nome);
-    strcat(sql, "', '");
-    strcat(sql, c->sobrenome);
-    strcat(sql, "', '");
-    strcat(sql, c->cpf);
-    strcat(sql, "', '");
-    strcat(sql, c->phone);
-    strcat(sql, "', ");
-    snprintf(str, 10, "%d", c->id_quarto);
-    strcat(sql, str);
-    strcat(sql, ", ");
-    snprintf(str, 10, "%d", c->id_reserva);
-    strcat(sql, str);
-    strcat(sql, ");");
-
-    char *erro = executar_sql(sql, NULL, NULL);
-    if (erro) puts(erro);
-
-    free(sql);
-
+int registrar_cliente(char *cliente_formatado) {
+    executar_sql(cliente_formatado, NULL, NULL);
     return 0;
 }
 
@@ -408,28 +379,8 @@ int reservar_quarto(int id_quarto, int id_reserva) {
     return 0;
 }
 
-int registrar_reserva(RESERVA *r) {
-    char *sql = (char *) malloc(sizeof(char) * 200);
-    char str[100];
-
-    strcpy(sql, "insert into reservas values (null, ");
-    snprintf(str, 10, "%d", r->id_cliente);
-    strcat(sql, str);
-    strcat(sql, ", ");
-    snprintf(str, 10, "%d", r->id_quarto);
-    strcat(sql, str);
-    strcat(sql, ", '");
-    formatar_data_sql(&r->inicio, str);
-    strcat(sql, str);
-    formatar_data_sql(&r->fim, str);
-    strcat(sql, "', '");
-    strcat(sql, str);
-    strcat(sql, "');");
-
-    executar_sql(sql, NULL, NULL);
-    reservar_quarto(r->id_quarto, r->id);
-    free(sql);
-
+int registrar_reserva(char *reserva_formatada) {
+    executar_sql(reserva_formatada, NULL, NULL);
     return 0;
 }
 

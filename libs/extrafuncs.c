@@ -3,6 +3,7 @@
 //
 
 #include "extrafuncs.h"
+#include "datas.h"
 
 #include <string.h>
 #include <ctype.h>
@@ -45,4 +46,9 @@ void limpar_tela() {
 int is_in(int valor, const int *array, int tamanho) {
     for (int i = 0; i < tamanho; i++) if (array[i] == valor) return 1;
     return 0;
+}
+
+void mostrar_titulo() {
+    printf("\n\n\t\t---- CAMPINA  COMFORT  PREMIUM ----\n\t\t\t  ");
+    mostrar_data_hora();
 }

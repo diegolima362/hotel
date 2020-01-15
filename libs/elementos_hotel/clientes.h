@@ -2,10 +2,10 @@
 // Created by diego on 07/01/2020.
 //
 
-#ifndef HOTEL_CLENTES_H
-#define HOTEL_CLENTES_H
+#ifndef HOTEL_CLIENTES_H
+#define HOTEL_CLIENTES_H
 
-#endif //HOTEL_CLENTES_H
+#endif //HOTEL_CLIENTES_H
 
 typedef struct end {
     char rua[60 + 1];
@@ -16,7 +16,7 @@ typedef struct end {
     char pais[30 + 1];
 } ENDERECO;
 
-typedef struct cliente {
+typedef struct clientes {
     int id;
     int id_reserva;
     int id_quarto;
@@ -34,6 +34,8 @@ CLIENTE criar_novo_cliente();
 void montar_cliente_sql(char *str, CLIENTE *c);
 
 int busca_cliente(char *coluna, char *valor, int *ids);
+
+char *formatar_cliente(CLIENTE *c);
 
 void listar_todos_clientes();
 

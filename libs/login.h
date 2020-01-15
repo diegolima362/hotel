@@ -15,6 +15,14 @@ typedef struct {
     char pwd[21];
 } LOGIN;
 
+int autenticar();
+
+int criar_login(LOGIN *login);
+
+void alterar_login();
+
+void tela_pegar_login(LOGIN *login);
+
 int existe_usuario_cadastrado();
 
 int validar_login(LOGIN *login_comparacao);

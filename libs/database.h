@@ -19,42 +19,10 @@ typedef struct quarto {
     float valor;
 } QUARTO;
 
-typedef struct end {
-    char rua[60 + 1];
-    int num;
-    char bairro[60 + 1];
-    char cidade[60 + 1];
-    char estado[30 + 1];
-    char pais[30 + 1];
-} ENDERECO;
-
-typedef struct cliente {
-    int id;
-    int id_reserva;
-    int id_quarto;
-    char nome[31];
-    char sobrenome[31];
-    char cpf[15];
-    char cred_card[20];
-    char phone[15];
-    //struct end end;
-    //int ativo;
-} CLIENTE;
-
-typedef struct reserva {
-    int id;
-    int status;
-    int id_cliente;
-    int id_quarto;
-    struct tm inicio;
-    struct tm fim;
-} RESERVA;
 
 int retorno(void *ptr, int resultados, char **STR1, char **STR2);
 
 void teste_int();
-
-char *executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr);
 
 int criar_banco();
 
@@ -63,15 +31,11 @@ int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2);
 int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado, int *ids,
                             int (*callback)(void *, int, char **, char **));
 
-int listar_clientes(char *column, char *filter, int limit, void *ids, int(*callback)(void *, int, char **, char **));
+int db_listar_clientes(char *column, char *filter, int limit, void *ids, int(*callback)(void *, int, char **, char **));
 
-int listar_reservas(char *column, char *filter, int limit, void *ids, int(*callback)(void *, int, char **, char **));
+int db_listar_reservas(char *column, char *filter, int limit, void *ids, int(*callback)(void *, int, char **, char **));
 
-int listar_quartos(char *column, char *filter, int limit, void *ids, int(*callback)(void *, int, char **, char **));
-
-int montar_cliente(void *ptr, int resultados, char **STR1, char **STR2);
-
-CLIENTE *recuperar_clientes(CLIENTE *c, char *id);
+int db_listar_quartos(char *column, char *filter, int limit, void *ids, int(*callback)(void *, int, char **, char **));
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2);
 
@@ -81,11 +45,11 @@ int remover_cliente(char *column, char *filter);
 
 int remover_reserva(char *column, char *filter);
 
-int registrar_cliente(CLIENTE *c);
+int registrar_cliente(char *cliente_formatado);
 
 int reservar_quarto(int id_quarto, int id_reserva);
 
-int registrar_reserva(RESERVA *r);
+int registrar_reserva(char *reserva_formatada);
 
 int gerar_id(char *tabela, int *id);
 
