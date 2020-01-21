@@ -26,11 +26,16 @@ void extrair_ids(int *ptr, char *valor_na_coluna) {
 }
 
 int exibir_resultados(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna) {
-    ((int *) ptr)[0] = (int) strtol(valor_na_coluna[0], NULL, 10);
-    extrair_ids((int *) ptr, valor_na_coluna[1]);
-    for (int i = 2; i < qtd_colunas; i++) {
-        upper(valor_na_coluna[i]);
-        printf("\t\t%s\n", valor_na_coluna[i]);
+    int qtd_resultados = (int) strtol(valor_na_coluna[0], NULL, 10);
+    ((int *) ptr)[0] = qtd_resultados;
+
+    if (qtd_resultados > 0) {
+        extrair_ids((int *) ptr, valor_na_coluna[1]);
+
+        for (int i = 2; i < qtd_colunas; i++) {
+            upper(valor_na_coluna[i]);
+            printf("\t\t%s\n", valor_na_coluna[i]);
+        }
     }
 
     return 0;

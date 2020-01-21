@@ -180,7 +180,8 @@ int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado, in
 }
 
 int
-db_listar_clientes(char *column, char *filter, int limit, void *ids, int (*callback)(void *, int, char **, char **)) {
+db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *ids,
+                   int (*callback)(void *, int, char **, char **)) {
     char *sql = (char *) malloc(sizeof(char) * 500);
     char char_limit[5];
 
@@ -201,7 +202,7 @@ db_listar_clientes(char *column, char *filter, int limit, void *ids, int (*callb
 
         if (strcmp(column, "id") == 0 || strcmp(column, "id_quarto") == 0 || strcmp(column, "id_reserva") == 0) {
             strcat(sql, column);
-            strcat(sql, " = ");
+            strcat(sql, "= ");
             strcat(sql, filter);
         } else {
             if (strcmp(column, "fullname") == 0) {
@@ -210,9 +211,9 @@ db_listar_clientes(char *column, char *filter, int limit, void *ids, int (*callb
                 strcat(sql, "%' ");
             } else {
                 strcat(sql, column);
-                strcat(sql, " like '%");
+                strcat(sql, " like '");
                 strcat(sql, filter);
-                strcat(sql, "%' ");
+                strcat(sql, "' ");
             }
         }
     }
@@ -222,9 +223,10 @@ db_listar_clientes(char *column, char *filter, int limit, void *ids, int (*callb
         strcat(sql, " limit ");
         strcat(sql, char_limit);
     }
-
     strcat(sql, ");");
+
     int qtd_resultados = executar_sql(sql, callback, ids);
+
     free(sql);
 
     return qtd_resultados;

@@ -13,7 +13,6 @@ void exibir_menu_principal();
 
 void exibir_menu_reservas();
 
-void exibir_menu_clientes();
 
 void exibir_menu_quartos();
 
@@ -23,15 +22,26 @@ void exibir_menu_configuracoes();
 
 void exibir_menu_dados_sistema();
 
-// menus de busca
-
-void exibir_menu_busca_cliente();
-
 // diretorios e base de dados
 
 int criar_banco_de_dados();
 
 int checar_diretorios();
+
+// menus edicao
+
+void exibir_menu_editar_reserva();
+
+
+// menus remocao
+
+void exibir_menu_remover_reserva();
+
+
+// menus listagem
+
+void exibir_menu_listar_reservas();
+
 
 int main(int argc, char *argv[]) {
 
@@ -43,14 +53,9 @@ int main(int argc, char *argv[]) {
 //    if (autenticar()) {
 //        exibir_menu_principal();
 //    }
-    int id[10] = {0};
-    int qtd = db_listar_clientes("id_reserva", "1", 10, id, exibir_resultados);
 
-    printf("\n\n resutados %d\n\n", qtd);
+    buscar_cliente();
 
-    for (int i = 1; i <= qtd; i++) {
-        printf("%d, ", id[i]);
-    }
 
     return 0;
 }
@@ -81,11 +86,19 @@ void exibir_menu_principal() {
                 break;
             case 2:
                 limpar_tela();
-                exibir_menu_dados_sistema();
+                exibir_menu_clientes();
                 break;
             case 3:
                 limpar_tela();
-                exibir_menu_configuracoes();
+                exibir_menu_quartos();
+                break;
+            case 4:
+                limpar_tela();
+                exibir_menu_servicos();
+                break;
+            case 5:
+                limpar_tela();
+                exibir_menu_dados_sistema();
                 break;
             case 0:
                 limpar_tela();
@@ -135,41 +148,20 @@ void exibir_menu_reservas() {
     } while (opcao != 0);
 }
 
-void exibir_menu_clientes() {
-    int opcao;
-    do {
-        limpar_tela();
-        mostrar_titulo();
-        printf("\n\tCLIENTES\n\n");
-        printf("\t\t(1) NOVO CLIENTE\n");
-        printf("\t\t (2) EDITAR CLIENTE\n");
-        printf("\t\t  (3) REMOVER CLIENTE\n\n");
-        printf("\t\t   (4) BUSCAR CLIENTE\n\n");
-        printf("\t\t    (4) LISTAR CLIENTES\n\n");
-        printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
-        scanf(" %d", &opcao);
 
-        switch (opcao) {
-            case 1:
-                criar_novo_cliente();
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                limpar_tela();
-                break;
-            case 0:
-                return;
-            default:
-                printf("\n\nOPCAO INVALIDA!\n\n");
-                pausa();
-                break;
-        }
-    } while (opcao != 0);
+void exibir_menu_listar_reservas() {
+
 }
+
+void exibir_menu_remover_reserva() {
+
+}
+
+
+void exibir_menu_editar_reserva() {
+
+}
+
 
 void exibir_menu_quartos() {
     int opcao;
@@ -209,12 +201,7 @@ void exibir_menu_servicos() {
     do {
         limpar_tela();
         mostrar_titulo();
-        printf("\n\tCLIENTES\n\n");
-        printf("\t\t(1) NOVO CLIENTE\n");
-        printf("\t\t (2) EDITAR CLIENTE\n");
-        printf("\t\t  (3) REMOVER CLIENTE\n\n");
-        printf("\t\t   (4) BUSCAR CLIENTE\n\n");
-        printf("\t\t    (4) LISTAR CLIENTES\n\n");
+
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPÇÃO: ");
         scanf(" %d", &opcao);
@@ -321,41 +308,7 @@ void exibir_menu_dados_sistema() {
 
 // menus de busca
 
-void exibir_menu_busca_cliente() {
-    int opcao;
-    char dado_busca[50];
 
-    do {
-        limpar_tela();
-        printf("\n\tBUSCAR CLIENTE\n\n");
-        printf("\t\t(1) BUSCAR POR NOME\n");
-        printf("\t\t  (2) BUSCAR POR CPF\n");
-        printf("\t\t    (3) BUSCAR POR ID\n");
-        printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
-        scanf(" %d", &opcao);
-
-        switch (opcao) {
-            case 1:
-                printf("\n\t\tINSIRA O NOME: ");
-                break;
-            case 2:
-                printf("\n\t\tINSIRA O CPF: ");
-                busca_cliente("cpf", dado_busca, NULL);
-                break;
-            case 3:
-                printf("\n\t\tINSIRA O ID: ");
-                busca_cliente("id", dado_busca, NULL);
-                break;
-            case 0:
-                return;
-            default:
-                printf("\n\nOPCAO INVALIDA!\n\n");
-                pausa();
-                break;
-        }
-    } while (opcao != 0);
-}
 
 // diretorios e base de dados
 

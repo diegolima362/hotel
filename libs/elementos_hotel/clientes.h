@@ -31,12 +31,26 @@ typedef struct clientes {
 
 CLIENTE criar_novo_cliente();
 
-void montar_cliente_sql(char *str, CLIENTE *c);
+int montar_cliente_sql(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
 
 int busca_cliente(char *coluna, char *valor, int *ids);
 
-char *formatar_cliente(CLIENTE *c, char *sql);
+void buscar_cliente();
 
-void listar_todos_clientes();
+char *formatar_insert_cliente(CLIENTE *c, char *sql);
+
+void listar_clientes(char *filter);
 
 void pegar_dados_cliente(CLIENTE *c);
+
+void buscar_cliente_edicao(int id);
+
+void exibir_menu_clientes();
+
+int exibir_menu_listar_clientes();
+
+void exibir_menu_remover_cliente();
+
+void exibir_menu_editar_cliente();
+
+int montar_busca_cliente(char *filter, char *value);

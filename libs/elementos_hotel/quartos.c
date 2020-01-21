@@ -81,6 +81,6 @@ int selecionar_tipo_quarto() {
 
 int busca_quarto(char *coluna, char *valor, int *ids) {
     int qtd_resultados;
-    qtd_resultados = db_listar_clientes(coluna, valor, -1, ids, exibir_resultados);
+    qtd_resultados = db_listar_clientes(coluna, valor, -1, NULL, ids, exibir_resultados);
     return qtd_resultados;
 }
