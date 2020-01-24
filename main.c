@@ -54,8 +54,7 @@ int main(int argc, char *argv[]) {
 //        exibir_menu_principal();
 //    }
 
-    buscar_cliente();
-
+    exibir_menu_gerenciar_clientes();
 
     return 0;
 }
@@ -86,7 +85,7 @@ void exibir_menu_principal() {
                 break;
             case 2:
                 limpar_tela();
-                exibir_menu_clientes();
+                exibir_menu_gerenciar_clientes();
                 break;
             case 3:
                 limpar_tela();

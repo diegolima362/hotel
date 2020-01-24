@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-void formatar_nome_tabela(char *str);
-
 void extrair_ids(int *ptr, char *valor_na_coluna) {
     if (ptr != NULL) {
         int index = 1;
@@ -39,13 +37,4 @@ int exibir_resultados(void *ptr, int qtd_colunas, char **valor_na_coluna, char *
     }
 
     return 0;
-}
-
-void formatar_nome_tabela(char *str) {
-    upper(str);
-    while (*str) {
-        if (*str == '_')
-            *str = ' ';
-        str++;
-    }
 }

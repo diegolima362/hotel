@@ -10,32 +10,8 @@
 
 int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr);
 
-int retorno(void *ptr, int resultados, char **STR1, char **STR2) {
-    int index = ++((int *) ptr)[0];
-    int value = 0;
-    for (int i = 0; i < resultados; i++) {
-        printf(" %s ", STR1[i]);
-        printf(" index %d\n", index);
-        value = (int) strtol(STR1[0], NULL, 10);
-    }
-    ((int *) ptr)[index] = value;
-    return 0;
-}
-
-void teste_int() {
-    int array[21] = {0};
-    array[0] = 0;
-    char *str = (char *) malloc(sizeof(char) * 500);
-    strcpy(str, "SELECT q.id "
-                "FROM quartos q WHERE q.tipo = 5 and q.id IN ( "
-                "SELECT r.id_quarto FROM reservas r JOIN quartos_reservados qr ON r.id_quarto = qr.id "
-                "WHERE (inicio <= '2020-01-15' AND fim >= '2020-01-15') OR "
-                "(inicio < '2020-01-20' AND fim >= '2020-01-20') OR ('2020-01-15' <= inicio AND '2020-01-20' >= inicio));");
-    executar_sql(str, retorno, array);
-
-    int i = 0;
-    while (array[++i])
-        printf(" %d ", array[i]);
+void executar_sql_externa(char *sql) {
+    executar_sql(sql, NULL, NULL);
 }
 
 int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr) {
@@ -185,22 +161,23 @@ db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *
     char *sql = (char *) malloc(sizeof(char) * 500);
     char char_limit[5];
 
-    strcpy(sql, "SELECT count(id), group_concat(id,','),"
+    strcpy(sql, "SELECT count(id) as 'qtd results', group_concat(id,',') as 'ids',"
                 "group_concat(concat, "
                 "'\n\t\t-----------------------------------------------\n\t\t') as result "
                 "FROM ("
                 "SELECT id, 'ID: ' || id || '\n\t\t' || 'NOME: ' || nome || ' ' || sobrenome || '\n\t\t' ||"
                 "'CPF: ' || cpf || '\n\t\t' ||"
                 "'PHONE: ' || phone || '\n\t\t' ||"
-                "'ID RESERVA: ' || id_reserva || '\n\t\t' ||"
-                "'ID QUARTO: ' || id_quarto"
+                "'RESERVA: ' || id_reserva || '\n\t\t' ||"
+                "'QUARTO: ' || id_quarto"
                 " as concat\n"
                 "         FROM clientes ");
 
     if (strcmp(column, "NULL") != 0) {
         strcat(sql, " where ");
 
-        if (strcmp(column, "id") == 0 || strcmp(column, "id_quarto") == 0 || strcmp(column, "id_reserva") == 0) {
+        if (strcmp(column, "id") == 0 || strcmp(column, "id_quarto") == 0 || strcmp(column, "id_reserva") == 0 ||
+            strcmp(column, "id_reserva!") == 0) {
             strcat(sql, column);
             strcat(sql, "= ");
             strcat(sql, filter);
@@ -324,7 +301,7 @@ int get_qtd_reservas() {
     return total;
 }
 
-int remover_cliente(char *column, char *filter) {
+int db_remover_cliente(char *column, char *filter) {
     char *sql = (char *) malloc(sizeof(char) * 150);
 
     strcpy(sql, "delete from clientes where ");
@@ -366,11 +343,6 @@ int remover_reserva(char *column, char *filter) {
     return 0;
 }
 
-int registrar_cliente(char *cliente_formatado) {
-    executar_sql(cliente_formatado, NULL, NULL);
-    return 0;
-}
-
 int reservar_quarto(int id_quarto, int id_reserva) {
     char *sql = (char *) malloc(sizeof(char) * 200);
     char str[100];
@@ -386,11 +358,6 @@ int reservar_quarto(int id_quarto, int id_reserva) {
     executar_sql(sql, NULL, NULL);
     free(sql);
 
-    return 0;
-}
-
-int registrar_reserva(char *reserva_formatada) {
-    executar_sql(reserva_formatada, NULL, NULL);
     return 0;
 }
 
@@ -419,3 +386,20 @@ int get_id_cliente() {
     return id;
 }
 
+int testar_id(int id, char *table) {
+    char sql[100];
+    char id_char[5];
+    int ids[10];
+
+    strcpy(sql, "select count(id) from ");
+    strcat(sql, table);
+    strcat(sql, " where id = ");
+
+    snprintf(id_char, 5, "%d", id);
+    strcat(sql, id_char);
+    strcat(sql, ";");
+
+    int resultado = executar_sql(sql, NULL, ids);
+
+    return resultado;
+}

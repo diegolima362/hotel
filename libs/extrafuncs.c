@@ -16,12 +16,6 @@ void pausa() {
     getchar();
 }
 
-char ctoup(char c) {
-    if (c >= 'a' && c <= 'z')
-        return (int) c - 32;
-    else return c;
-}
-
 char *upper(char *str) {
     for (int i = 0; str[i] != '\0'; i++)
         str[i] = toupper(str[i]);
@@ -51,4 +45,37 @@ int is_in(int valor, const int *array, int tamanho) {
 void mostrar_titulo() {
     printf("\n\n\t\t---- CAMPINA  COMFORT  PREMIUM ----\n\t\t\t  ");
     mostrar_data_hora();
+}
+
+char * strrstr( char *s1, char * s2 )
+{
+    char * ss1;
+    char * sss1;
+    char * sss2;
+
+    if( *( s2 ) == '\0' )
+    {
+        return s1;
+    }
+
+    ss1 = s1 + strlen( s1 );
+
+    while( ss1 != s1 )
+    {
+        --ss1;
+
+        for( sss1 = ss1, sss2 = s2; ; )
+        {
+            if( *( sss1++ ) != *( sss2++ ) )
+            {
+                break;
+            }
+            else if ( * sss2 == '\0' )
+            {
+                return ss1;
+            }
+        }
+    }
+
+    return NULL;
 }

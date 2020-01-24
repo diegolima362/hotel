@@ -53,8 +53,6 @@ void criar_nova_reserva(CLIENTE *c) {
         if (opcao[0] == 's' || opcao[0] == 'S') break;
     } while (1);
 
-    pegar_dados_cliente(c);
-
     gerar_id("clientes", &c->id);
     gerar_id("reservas", &r.id);
 
@@ -63,7 +61,7 @@ void criar_nova_reserva(CLIENTE *c) {
     c->id_quarto = r.id_quarto;
 
 
-    registrar_reserva(formatar_reserva(&r));
+    executar_sql_externa(formatar_reserva(&r));
 }
 
 void mostrar_reserva(RESERVA *r, CLIENTE *c) {
@@ -127,15 +125,12 @@ void buscar_reserva() {
         switch (opcao) {
             case 1:
                 printf("\n\t\tINSIRA O NOME: ");
-                busca_cliente("NOME", dados_busca, NULL);
                 break;
             case 2:
                 printf("\n\t\tINSIRA O CPF: ");
-                busca_cliente("NOME", dados_busca, NULL);
                 break;
             case 3:
                 printf("\n\t\tINSIRA O ID: ");
-                busca_cliente("NOME", dados_busca, NULL);
                 break;
             case 0:
                 return;

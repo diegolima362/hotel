@@ -26,7 +26,7 @@ void limpar_teclado();
  * retorna a string toda em maiuscula
  * @param str string para fazer uppercase
  */
-char * upper(char *str);
+char *upper(char *str);
 
 /**
  * remover quebra de linha de uma string
@@ -34,6 +34,8 @@ char * upper(char *str);
  */
 void remover_quebra(char *str);
 
-int is_in(int valor, const int*array, int tamanho);
+int is_in(int valor, const int *array, int tamanho);
 
 void mostrar_titulo();
+
+char *strrstr(char *s1, char *s2);
