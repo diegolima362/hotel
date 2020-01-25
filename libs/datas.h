@@ -8,7 +8,7 @@
 #endif //HOTEL_DATAS_H
 
 /**
- * ler date e hora atual do sistema operacional
+ * ler data e hora atual do sistema operacional
  *
  * @return struct com o tempo atual
  */

@@ -31,11 +31,11 @@ int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado, in
 int db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *ids,
                        int (*callback)(void *, int, char **, char **));
 
-int db_listar_reservas(char *column, char *filter, int limit, void *ids,
-                       int(*callback)(void *, int, char **, char **));
+int db_listar_reservas(char *column, char *filter, int limit, char *order_by, void *ids,
+                       int (*callback)(void *, int, char **, char **));
 
-int db_listar_quartos(char *column, char *filter, int limit, void *ids,
-                      int(*callback)(void *, int, char **, char **));
+int db_listar_quartos(char *column, char *filter, int limit, char *order_by, void *ids,
+                      int (*callback)(void *, int, char **, char **));
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2);
 

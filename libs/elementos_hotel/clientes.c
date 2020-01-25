@@ -13,8 +13,6 @@
 
 #define LIMIT_BUSCA 1000
 
-void registrar_cliente();
-
 void exibir_menu_editar_cliente();
 
 void exibir_menu_remover_cliente();
@@ -26,8 +24,6 @@ int exibir_menu_listar_clientes(char *column, char *filter);
 int montar_cliente_sql(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
 
 void pegar_dados_cliente(CLIENTE *c);
-
-void montar_cliente_busca(int id, CLIENTE *cliente);
 
 void exibir_struct_cliente(CLIENTE *c);
 
@@ -89,7 +85,7 @@ void exibir_menu_gerenciar_clientes() {
     } while (opcao != 0);
 }
 
-void registrar_cliente() {
+int registrar_cliente() {
     char sql[300];
     CLIENTE c;
 
@@ -99,6 +95,8 @@ void registrar_cliente() {
     pegar_dados_cliente(&c);
     formatar_insert_cliente(&c, sql);
     executar_sql_externa(sql);
+
+    return c.id;
 }
 
 void exibir_menu_editar_cliente() {
@@ -387,6 +385,14 @@ void exibir_struct_cliente(CLIENTE *c) {
     printf("\n\t\tQUARTO: %d", c->id_quarto);
 }
 
+int buscar_clientes() {
+    return selecionar_cliente(exibir_menu_buscar_clientes, NULL);
+}
+
+int listar_clientes() {
+    return selecionar_cliente(exibir_menu_listar_clientes, NULL);
+}
+
 void visualizar_clientes(int (*pFunction)(char *, char *)) {
     CLIENTE c;
     int op;
@@ -459,7 +465,7 @@ int selecionar_cliente(int (*pFunction)(char *, char *), CLIENTE *cliente) {
                 } else {
                     printf("\n\t\tID NAO LISTADO\n");
                     pausa();
-                    return -1;
+                    return 0;
                 }
             }
         }
@@ -532,6 +538,7 @@ void formatar_update_cliente(CLIENTE *c, char *sql) {
 
     strcat(sql, "', phone = '");
     strcat(sql, c->phone);
+
     strcat(sql, "', where id = ");
     snprintf(str, 10, "%d", c->id);
     strcat(sql, str);

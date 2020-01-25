@@ -30,3 +30,11 @@ typedef struct clientes {
 } CLIENTE;
 
 void exibir_menu_gerenciar_clientes();
+
+int registrar_cliente();
+
+int buscar_clientes();
+
+int listar_clientes();
+
+void montar_cliente_busca(int id, CLIENTE *cliente);

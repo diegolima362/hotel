@@ -11,7 +11,7 @@
 
 void exibir_menu_principal();
 
-void exibir_menu_reservas();
+void exibir_menu_gerenciar_reservas();
 
 
 void exibir_menu_quartos();
@@ -30,12 +30,12 @@ int checar_diretorios();
 
 // menus edicao
 
-void exibir_menu_editar_reserva();
+void exibir_menu_editar_cliente();
 
 
 // menus remocao
 
-void exibir_menu_remover_reserva();
+void exibir_menu_remover_cliente();
 
 
 // menus listagem
@@ -54,8 +54,19 @@ int main(int argc, char *argv[]) {
 //        exibir_menu_principal();
 //    }
 
-    exibir_menu_gerenciar_clientes();
+    RESERVA r;
+    char sql[500];
 
+//    r.id = 214;
+//    r.id_cliente = 5;
+//    r.id_quarto = 6;
+//    r.inicio = ler_data();
+//    r.fim = ler_data();
+//    formatar_update_reservas(&r, sql);
+
+    int ids[100];
+//    db_listar_reservas("id", "201", -1, "id", ids, exibir_resultados);
+    teste_reserva();
     return 0;
 }
 
@@ -81,7 +92,7 @@ void exibir_menu_principal() {
         switch (opcao) {
             case 1:
                 limpar_tela();
-                exibir_menu_reservas();
+                exibir_menu_gerenciar_reservas();
                 break;
             case 2:
                 limpar_tela();
@@ -110,55 +121,6 @@ void exibir_menu_principal() {
                 break;
         }
     } while (opcao != 0);
-}
-
-void exibir_menu_reservas() {
-    int opcao;
-    do {
-        limpar_tela();
-        mostrar_titulo();
-        printf("\n\tRESERVAS\n\n");
-        printf("\t\t(1) NOVA RESERVA\n");
-        printf("\t\t (2) EDITAR RESERVA\n");
-        printf("\t\t  (3) ENCERRAR RESERVA\n\n");
-        printf("\t\t   (4) BUSCAR RESERVA\n");
-        printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
-        scanf(" %d", &opcao);
-
-        switch (opcao) {
-            case 1:
-                criar_nova_reserva(NULL);
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                limpar_tela();
-                break;
-            case 0:
-                return;
-            default:
-                printf("\n\nOPCAO INVALIDA!\n\n");
-                pausa();
-                break;
-        }
-    } while (opcao != 0);
-}
-
-
-void exibir_menu_listar_reservas() {
-
-}
-
-void exibir_menu_remover_reserva() {
-
-}
-
-
-void exibir_menu_editar_reserva() {
-
 }
 
 
@@ -285,7 +247,6 @@ void exibir_menu_dados_sistema() {
 
         switch (opcao) {
             case 1:
-                exibir_qtd_reservas();
                 break;
             case 2:
                 break;

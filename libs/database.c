@@ -158,11 +158,11 @@ int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado, in
 int
 db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *ids,
                    int (*callback)(void *, int, char **, char **)) {
+
     char *sql = (char *) malloc(sizeof(char) * 500);
     char char_limit[5];
 
-    strcpy(sql, "SELECT count(id) as 'qtd results', group_concat(id,',') as 'ids',"
-                "group_concat(concat, "
+    strcpy(sql, "SELECT count(id) as 'qtd results', group_concat(id,',') as 'ids', group_concat(concat, "
                 "'\n\t\t-----------------------------------------------\n\t\t') as result "
                 "FROM ("
                 "SELECT id, 'ID: ' || id || '\n\t\t' || 'NOME: ' || nome || ' ' || sobrenome || '\n\t\t' ||"
@@ -170,8 +170,7 @@ db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *
                 "'PHONE: ' || phone || '\n\t\t' ||"
                 "'RESERVA: ' || id_reserva || '\n\t\t' ||"
                 "'QUARTO: ' || id_quarto"
-                " as concat\n"
-                "         FROM clientes ");
+                " as concat FROM clientes ");
 
     if (strcmp(column, "NULL") != 0) {
         strcat(sql, " where ");
@@ -195,11 +194,17 @@ db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *
         }
     }
 
+    if (order_by != NULL) {
+        strcat(sql, " order by ");
+        strcat(sql, order_by);
+    }
+
     if (limit > 0) {
         snprintf(char_limit, 5, "%d", limit);
         strcat(sql, " limit ");
         strcat(sql, char_limit);
     }
+
     strcat(sql, ");");
 
     int qtd_resultados = executar_sql(sql, callback, ids);
@@ -210,68 +215,81 @@ db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *
 }
 
 int
-db_listar_reservas(char *column, char *filter, int limit, void *ids,
+db_listar_reservas(char *column, char *filter, int limit, char *order_by, void *ids,
                    int (*callback)(void *, int, char **, char **)) {
-    char *sql = (char *) malloc(sizeof(char) * 150);
-    char char_limit[3];
-    snprintf(char_limit, 3, "%d", limit);
 
-    strcpy(sql, "select * from reservas where ");
+    char *sql = (char *) malloc(sizeof(char) * 500);
+    char char_limit[5];
 
-    if (strcmp(column, "id") == 0 || strcmp(column, "id_cliente") == 0) {
+    strcpy(sql,
+           "SELECT count(id), group_concat(id, ','), group_concat(concat, '\t\t-----------------------------------------------\n\t\t') as result "
+           "FROM (SELECT id, 'RESERVA: ' || id || '\n\t\t' || 'CLIENTE: ' || id_cliente || '\n\t\t' || 'QUARTO: ' || id_quarto || '\n\t\t' || "
+           "'INICIO: ' || inicio || '\n\t\t' || 'FIM: ' || fim as concat FROM reservas ");
+
+    if (strcmp(column, "NULL") != 0) {
+        strcat(sql, " where ");
         strcat(sql, column);
-        strcat(sql, " = ");
+        strcat(sql, "= ");
         strcat(sql, filter);
-    } else {
-        strcat(sql, column);
-        strcat(sql, " like '");
-        strcat(sql, filter);
-        strcat(sql, "' ");
+    }
+
+    if (order_by != NULL) {
+        strcat(sql, " order by ");
+        strcat(sql, order_by);
     }
 
     if (limit > 0) {
+        snprintf(char_limit, 5, "%d", limit);
         strcat(sql, " limit ");
         strcat(sql, char_limit);
     }
 
-    strcat(sql, ";");
-    executar_sql(sql, mostrar_resultados, ids);
+    strcat(sql, ");");
+
+    int qtd_resultados = executar_sql(sql, callback, ids);
 
     free(sql);
 
-    return ids != NULL ? ((int *) ids)[0] : -1;
+    return qtd_resultados;
 }
 
 int
-db_listar_quartos(char *column, char *filter, int limit, void *ids,
+db_listar_quartos(char *column, char *filter, int limit, char *order_by, void *ids,
                   int (*callback)(void *, int, char **, char **)) {
-    char *sql = (char *) malloc(sizeof(char) * 150);
-    char char_limit[3];
-    snprintf(char_limit, 3, "%d", limit);
 
-    strcpy(sql, "select * from quartos where ");
+    char *sql = (char *) malloc(sizeof(char) * 500);
+    char char_limit[5];
 
-    if (strcmp(column, "id") == 0 || strcmp(column, "valor") == 0) {
+    strcpy(sql,
+           "SELECT count(id), group_concat(id, ','), group_concat(concat, '\t\t-----------------------------------------------\n\t\t') as result "
+           "FROM (SELECT id, 'NUMERO: ' || id || '\n\t\t' || 'CLIENTE: ' || id_cliente || '\n\t\t' || 'QUARTO: ' || id_quarto || '\n\t\t' || "
+           "'INICIO: ' || inicio || '\n\t\t' || 'FIM: ' || fim as concat FROM reservas ");
+
+    if (strcmp(column, "NULL") != 0) {
+        strcat(sql, " where ");
         strcat(sql, column);
-        strcat(sql, " = ");
+        strcat(sql, "= ");
         strcat(sql, filter);
-    } else {
-        strcat(sql, column);
-        strcat(sql, " like '");
-        strcat(sql, filter);
-        strcat(sql, "' ");
+    }
+
+    if (order_by != NULL) {
+        strcat(sql, " order by ");
+        strcat(sql, order_by);
     }
 
     if (limit > 0) {
+        snprintf(char_limit, 5, "%d", limit);
         strcat(sql, " limit ");
         strcat(sql, char_limit);
     }
 
-    strcat(sql, ";");
-    executar_sql(sql, mostrar_resultados, NULL);
+    strcat(sql, ");");
+
+    int qtd_resultados = executar_sql(sql, callback, ids);
 
     free(sql);
-    return 0;
+
+    return qtd_resultados;
 }
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2) {
@@ -389,7 +407,7 @@ int get_id_cliente() {
 int testar_id(int id, char *table) {
     char sql[100];
     char id_char[5];
-    int ids[10];
+    int ids[10] = {0};
 
     strcpy(sql, "select count(id) from ");
     strcat(sql, table);
@@ -399,7 +417,6 @@ int testar_id(int id, char *table) {
     strcat(sql, id_char);
     strcat(sql, ";");
 
-    int resultado = executar_sql(sql, NULL, ids);
-
+    int resultado = executar_sql(sql, montar_qtd, ids);
     return resultado;
 }
