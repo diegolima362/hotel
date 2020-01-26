@@ -19,23 +19,21 @@ typedef struct quarto {
     float valor;
 } QUARTO;
 
-void executar_sql_externa(char *sql);
+int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr);
 
 int criar_banco();
 
 int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2);
 
-int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado, int *ids,
-                            int (*callback)(void *, int, char **, char **));
+int
+db_listar_quartos_reservar(char *inicio, char *fim, int ocupado, void *ids,
+                           int (*callback)(void *, int, char **, char **));
 
 int db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *ids,
                        int (*callback)(void *, int, char **, char **));
 
-int db_listar_reservas(char *column, char *filter, int limit, char *order_by, void *ids,
+int db_listar_reservas(char *column, char *filter, int ativa, int limit, char *order_by, void *ids,
                        int (*callback)(void *, int, char **, char **));
-
-int db_listar_quartos(char *column, char *filter, int limit, char *order_by, void *ids,
-                      int (*callback)(void *, int, char **, char **));
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2);
 

@@ -43,8 +43,10 @@ int is_in(int valor, const int *array, int tamanho) {
 }
 
 void mostrar_titulo() {
+    limpar_tela();
     printf("\n\n\t\t---- CAMPINA  COMFORT  PREMIUM ----\n\t\t\t  ");
     mostrar_data_hora();
+    puts("\n");
 }
 
 char * strrstr( char *s1, char * s2 )

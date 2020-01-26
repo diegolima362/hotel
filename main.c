@@ -11,9 +11,6 @@
 
 void exibir_menu_principal();
 
-void exibir_menu_gerenciar_reservas();
-
-
 void exibir_menu_quartos();
 
 void exibir_menu_servicos();

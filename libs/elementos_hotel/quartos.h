@@ -10,10 +10,10 @@
 #include <bits/types/struct_tm.h>
 #include "../datas.h"
 
-int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, int tipo, int *index);
+int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, int tipo, int *ids);
 
 int selecionar_quarto(struct tm *data_inicio, struct tm *data_final, int *id_quarto);
 
 int selecionar_tipo_quarto();
 
-int busca_quarto(char *coluna, char *valor, int *ids);
+int busca_quarto_id(int id);

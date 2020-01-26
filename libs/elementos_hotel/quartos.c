@@ -14,38 +14,98 @@
 #include "../browserdb.h"
 #include "../extrafuncs.h"
 
-int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, int tipo, int *index) {
+#define LIMIT_BUSCA 100
+
+void formatar_quartos_disponiveis(char *sql, char *tipo, char *inicio, char *fim) {
+    strcpy(sql,
+           "SELECT count(id), group_concat(id, ','), 'TIPO: ' || descricao, 'VALOR: ' || valor, 'QUARTOS: \n\t\t[ ' || group_concat(id, ' ][ ') || ' ]'");
+    strcat(sql, "FROM (SELECT q.id, q.valor, q.descricao FROM quartos q ");
+    if (tipo != NULL) {
+        strcat(sql, " WHERE q.tipo = ");
+        strcat(sql, tipo);
+        strcat(sql, " AND ");
+    }
+    strcat(sql, "q.id NOT IN (SELECT r.id_quarto FROM reservas r JOIN quartos_reservados qr ON r.id_quarto = qr.id ");
+    strcat(sql, "WHERE (inicio <= '");
+    strcat(sql, inicio);
+    strcat(sql, "' AND fim >= '");
+    strcat(sql, inicio);
+    strcat(sql, "') OR (inicio < '");
+    strcat(sql, fim);
+    strcat(sql, "' AND fim >= '");
+    strcat(sql, fim);
+    strcat(sql, "') OR ('");
+    strcat(sql, inicio);
+    strcat(sql, "' <= inicio AND '");
+    strcat(sql, fim);
+    strcat(sql, "' >= inicio)));");
+}
+
+int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, int tipo, int *ids) {
     char inicio[15], fim[15], tipo_quarto[3];
+    char sql[500];
 
     formatar_data_sql(data_inicio, inicio);
     formatar_data_sql(data_final, fim);
     snprintf(tipo_quarto, 3, "%d", tipo);
+    formatar_quartos_disponiveis(sql, tipo_quarto, inicio, fim);
+    int qtd = executar_sql(sql, exibir_resultados, ids);
 
-    printf("\n\t\t%6s%7s%11s%12s", "NUM", "TIPO", "DESCRICAO", "VALOR");
-
-    listar_quartos_ocupados(inicio, fim, tipo_quarto, 0, index, exibir_resultados);
-
-    return 0;
+    return qtd;
 }
 
 int selecionar_quarto(struct tm *data_inicio, struct tm *data_final, int *id_quarto) {
     int total_quartos = 25;
-    int index[25] = {0};
+    int ids_encontrados[LIMIT_BUSCA] = {0};
+    int tipo;
+    int op;
 
-    int tipo = selecionar_tipo_quarto();
-    if (tipo == 0)
-        return -1;
     do {
-        mostrar_quartos_disponiveis(data_inicio, data_final, tipo, index);
-        printf("\n\n\t\tNUMERO DO QUARTO: ");
-        scanf(" %d", id_quarto);
+        limpar_tela();
+        mostrar_titulo();
+        puts("\n");
+        tipo = selecionar_tipo_quarto();
 
-        index[0] = 0;
-        if (*id_quarto != 0 && is_in(*id_quarto, index, total_quartos)) {
-            return *id_quarto;
-        } else {
-            printf("\n\n\t\tNUMERO INVALIDO!\n");
+        limpar_tela();
+        mostrar_titulo();
+        puts("\n");
+
+        if (tipo == 0)
+            return 0;
+        else if (mostrar_quartos_disponiveis(data_inicio, data_final, tipo, ids_encontrados) == 0) {
+            printf("\n\n\t\tNAO EXISTEM QUARTOS DESSE TIPO DISPONIVEIS NESSA DATA\n");
             pausa();
+            continue;
+        }
+
+        while (1) {
+            printf("\n\n\t\tNUMERO DO QUARTO: ");
+            scanf(" %d", id_quarto);
+
+            if (*id_quarto != 0 && is_in(*id_quarto, ids_encontrados, total_quartos)) {
+                limpar_tela();
+                mostrar_titulo();
+                printf("\n\n\t\tDADOS DO QUARTO\n");
+                busca_quarto_id(*id_quarto);
+
+                printf("\n\n\t\t(1) SELECIONAR QUARTO (0) VOLTAR: ");
+                scanf(" %d", &op);
+
+                if (op == 1)
+                    return *id_quarto;
+                else if (op == 0)
+                    return 0;
+
+            } else {
+                printf("\n\n\t\tNUMERO INVALIDO!\n");
+                pausa();
+
+                limpar_tela();
+                mostrar_titulo();
+                puts("\n");
+
+                mostrar_quartos_disponiveis(data_inicio, data_final, tipo, ids_encontrados);
+            }
         }
     } while (1);
 }
@@ -55,7 +115,7 @@ int selecionar_tipo_quarto() {
     do {
         limpar_tela();
         mostrar_titulo();
-        printf("\n\tSELECIONAR QUARTO\n");
+        printf("\n\n\t\tSELECIONAR QUARTO\n");
         printf("\n\t\t(7) PRESIDENCIAL\n");
         printf("\n\t\t (6) LUXO SIMPLES");
         printf("\n\t\t  (5) LUXO DUPLO");
@@ -79,8 +139,18 @@ int selecionar_tipo_quarto() {
     return tipo;
 }
 
-int busca_quarto(char *coluna, char *valor, int *ids) {
-    int qtd_resultados;
-    qtd_resultados = db_listar_clientes(coluna, valor, -1, NULL, ids, exibir_resultados);
-    return qtd_resultados;
+int busca_quarto_id(int id) {
+    char sql[200];
+    char str[5];
+    int ids[5];
+
+    strcpy(sql,
+           "SELECT count(id), group_concat(id, ','), 'TIPO: ' || descricao, 'VALOR: ' || valor, 'NUMERO: \n\t\t[ ' || id || ' ]'");
+    strcat(sql, "FROM (SELECT q.id, q.valor, q.descricao FROM quartos q ");
+    strcat(sql, " WHERE id = ");
+    snprintf(str, 5, "%d", id);
+    strcat(sql, str);
+    strcat(sql, ");");
+
+    return executar_sql(sql, exibir_resultados, ids);
 }

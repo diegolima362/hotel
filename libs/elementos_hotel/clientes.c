@@ -45,7 +45,6 @@ void exibir_menu_gerenciar_clientes() {
     int opcao;
 
     do {
-        limpar_tela();
         mostrar_titulo();
         printf("\n\n\t\tCLIENTES\n\n");
         printf("\t\t(1) REGISTRAR CLIENTE\n\n");
@@ -89,12 +88,13 @@ int registrar_cliente() {
     char sql[300];
     CLIENTE c;
 
+    gerar_id("clientes", &c.id);
     c.id_reserva = 0;
     c.id_quarto = 0;
 
     pegar_dados_cliente(&c);
     formatar_insert_cliente(&c, sql);
-    executar_sql_externa(sql);
+    executar_sql(sql, NULL, NULL);
 
     return c.id;
 }
@@ -105,12 +105,11 @@ void exibir_menu_editar_cliente() {
     int id;
 
     do {
-        limpar_tela();
         mostrar_titulo();
         printf("\n\n\t\tEDITAR CLIENTE\n\n");
         printf("\t\t(1) BUSCAR CLIENTE PARA EDICAO\n");
         printf("\t\t (2) LISTAR CLIENTES\n");
-        printf("\t\t  (3) INSERIR ID CLIENTES\n");
+        printf("\t\t  (3) INSERIR ID DO CLIENTES\n");
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPÇÃO: ");
         scanf(" %d", &opcao);
@@ -238,7 +237,6 @@ int exibir_menu_buscar_clientes(char *filter, char *value) {
 int exibir_menu_listar_clientes(char *column, char *filter) {
     int opcao;
     while (1) {
-        limpar_tela();
         mostrar_titulo();
         printf("\n\n\t\tLISTAR CLIENTES\n\n");
         printf("\t\t(1) LISTAR TODOS OS CLIENTES REGISTRADOS\n");
@@ -369,7 +367,7 @@ void montar_cliente_busca(int id, CLIENTE *cliente) {
     char id_char[6];
     snprintf(id_char, 6, "%d", id);
 
-    db_listar_clientes("id", id_char, 1, "nome", &c, montar_cliente_sql);
+    db_listar_clientes("id", id_char, 1, "id", &c, montar_cliente_sql);
     exibir_struct_cliente(&c);
 
     if (cliente != NULL)
@@ -379,7 +377,7 @@ void montar_cliente_busca(int id, CLIENTE *cliente) {
 void exibir_struct_cliente(CLIENTE *c) {
     printf("\n\t\tID: %d", c->id);
     printf("\n\t\tNOME: %s %s", c->nome, c->sobrenome);
-    printf("\n\t\tCPF: %s", c->nome);
+    printf("\n\t\tCPF: %s", c->cpf);
     printf("\n\t\tPHONE: %s", c->phone);
     printf("\n\t\tRESERVA: %d", c->id_reserva);
     printf("\n\t\tQUARTO: %d", c->id_quarto);
@@ -430,11 +428,10 @@ int selecionar_cliente(int (*pFunction)(char *, char *), CLIENTE *cliente) {
     int id;
 
     if (pFunction(column, filter)) {
-        limpar_tela();
         mostrar_titulo();
         puts("\n\n\t\tRESULTADOS\n\n");
 
-        int total_resultados = db_listar_clientes(column, filter, LIMIT_BUSCA, "nome", ids_encontrados,
+        int total_resultados = db_listar_clientes(column, filter, LIMIT_BUSCA, "id", ids_encontrados,
                                                   exibir_resultados);
 
         if (total_resultados == 0) {
@@ -454,10 +451,10 @@ int selecionar_cliente(int (*pFunction)(char *, char *), CLIENTE *cliente) {
                 if (is_in(id, ids_encontrados, total_resultados + 1)) {
                     int confirm;
 
-                    limpar_tela();
+                    mostrar_titulo();
                     montar_cliente_busca(id, cliente);
 
-                    printf("\n\n\t\t(1) CONFIRMAR (0) VOLTAR :  ");
+                    printf("\n\n\t\t(1) SELECIONAR CLIENTE (0) VOLTAR :  ");
                     scanf(" %d", &confirm);
 
                     return confirm == 1 ? id : selecionar_cliente(pFunction, NULL);
@@ -474,12 +471,10 @@ int selecionar_cliente(int (*pFunction)(char *, char *), CLIENTE *cliente) {
 }
 
 void editar_dados_cliente(CLIENTE *c) {
-    limpar_tela();
     mostrar_titulo();
     printf("\n\n\t\tEDITAR DADOS DO CLIENTE\n\n");
     pegar_dados_cliente(c);
 
-    limpar_tela();
     mostrar_titulo();
     printf("\n\n\t\tEDITAR DADOS DO CLIENTE\n\n");
     exibir_struct_cliente(c);
@@ -492,7 +487,7 @@ void editar_dados_cliente(CLIENTE *c) {
 
     if (op == 1) {
         formatar_update_cliente(c, sql);
-        executar_sql_externa(sql);
+        executar_sql(sql, NULL, NULL);
 
         limpar_tela();
         printf("\n\t\tFINALIZADO\n");

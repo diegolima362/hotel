@@ -8,12 +8,6 @@
 #include <stdio.h>
 #include <sqlite3.h>
 
-int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr);
-
-void executar_sql_externa(char *sql) {
-    executar_sql(sql, NULL, NULL);
-}
-
 int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr) {
     char *error_msg;
     sqlite3 *db;
@@ -117,22 +111,16 @@ int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2) {
     return 0;
 }
 
-int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado, int *ids,
-                            int (*callback)(void *, int, char **, char **)) {
+int
+db_listar_quartos_reservar(char *inicio, char *fim, int ocupado, void *ids,
+                           int (*callback)(void *, int, char **, char **)) {
 
-    char *sql = (char *) malloc(sizeof(char) * 350);
-    strcpy(sql, "SELECT q.id, q.tipo, q.descricao, q.valor FROM quartos q WHERE ");
+    char *sql = (char *) malloc(sizeof(char) * 500);
+    char char_limit[5];
 
-    if (tipo != NULL) {
-        strcat(sql, "q.tipo = ");
-        strcat(sql, tipo);
-        strcat(sql, " and ");
-    }
-
-    strcat(sql, "q.id ");
-
-    if (ocupado == 0)
-        strcat(sql, " NOT ");
+    strcpy(sql,
+           "SELECT count(id), group_concat(id, ','), 'TIPO: ' || descricao, 'VALOR: ' || valor, 'QUARTOS: ' || group_concat(id, ' | ') "
+           "");
 
     strcat(sql, "IN ( SELECT r.id_quarto FROM reservas r "
                 "JOIN quartos_reservados qr ON r.id_quarto = qr.id WHERE (inicio <= '");
@@ -149,10 +137,16 @@ int listar_quartos_ocupados(char *inicio, char *fim, char *tipo, int ocupado, in
     strcat(sql, fim);
     strcat(sql, "' >= inicio));");
 
-    executar_sql(sql, callback, ids);
+
+    strcat(sql, ");");
+
+    int qtd_resultados = 0;// executar_sql(sql, callback, ids);
+
+    puts(sql);
+    getchar();
     free(sql);
 
-    return 0;
+    return qtd_resultados;
 }
 
 int
@@ -215,7 +209,7 @@ db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *
 }
 
 int
-db_listar_reservas(char *column, char *filter, int limit, char *order_by, void *ids,
+db_listar_reservas(char *column, char *filter, int ativa, int limit, char *order_by, void *ids,
                    int (*callback)(void *, int, char **, char **)) {
 
     char *sql = (char *) malloc(sizeof(char) * 500);
@@ -224,45 +218,6 @@ db_listar_reservas(char *column, char *filter, int limit, char *order_by, void *
     strcpy(sql,
            "SELECT count(id), group_concat(id, ','), group_concat(concat, '\t\t-----------------------------------------------\n\t\t') as result "
            "FROM (SELECT id, 'RESERVA: ' || id || '\n\t\t' || 'CLIENTE: ' || id_cliente || '\n\t\t' || 'QUARTO: ' || id_quarto || '\n\t\t' || "
-           "'INICIO: ' || inicio || '\n\t\t' || 'FIM: ' || fim as concat FROM reservas ");
-
-    if (strcmp(column, "NULL") != 0) {
-        strcat(sql, " where ");
-        strcat(sql, column);
-        strcat(sql, "= ");
-        strcat(sql, filter);
-    }
-
-    if (order_by != NULL) {
-        strcat(sql, " order by ");
-        strcat(sql, order_by);
-    }
-
-    if (limit > 0) {
-        snprintf(char_limit, 5, "%d", limit);
-        strcat(sql, " limit ");
-        strcat(sql, char_limit);
-    }
-
-    strcat(sql, ");");
-
-    int qtd_resultados = executar_sql(sql, callback, ids);
-
-    free(sql);
-
-    return qtd_resultados;
-}
-
-int
-db_listar_quartos(char *column, char *filter, int limit, char *order_by, void *ids,
-                  int (*callback)(void *, int, char **, char **)) {
-
-    char *sql = (char *) malloc(sizeof(char) * 500);
-    char char_limit[5];
-
-    strcpy(sql,
-           "SELECT count(id), group_concat(id, ','), group_concat(concat, '\t\t-----------------------------------------------\n\t\t') as result "
-           "FROM (SELECT id, 'NUMERO: ' || id || '\n\t\t' || 'CLIENTE: ' || id_cliente || '\n\t\t' || 'QUARTO: ' || id_quarto || '\n\t\t' || "
            "'INICIO: ' || inicio || '\n\t\t' || 'FIM: ' || fim as concat FROM reservas ");
 
     if (strcmp(column, "NULL") != 0) {

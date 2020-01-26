@@ -67,10 +67,8 @@ int comparar_data(struct tm *time_1, struct tm *time_2) {
 
     formatar_data_sql(time_1, inicio);
     formatar_data_sql(time_2, final);
-    puts(inicio);
-    puts(final);
+
     int comp = strcmp(inicio, final);
-    printf("\nComp %d\n", comp);
     // comparar datas no formato "yyyy-mm-dd"
     return comp;
 }
@@ -101,9 +99,15 @@ int validar_data(struct tm *date) {
 }
 
 int validar_periodo(struct tm *data_inicio, struct tm *data_final) {
+    struct tm today = ler_data();
 
+    // verificar formato das datas inseridos
     if (validar_data(data_inicio) != 1 || validar_data(data_final) != 1) return 0;
 
+    // verificar se data passada < data atual
+    if (comparar_data(data_inicio, &today) < 0 || comparar_data(data_final, &today) < 0) return 0;
+
+    // verificar se data final < data inicial
     return comparar_data(data_inicio, data_final) > 0 ? 0 : 1;
 }
 
