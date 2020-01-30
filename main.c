@@ -121,68 +121,7 @@ void exibir_menu_principal() {
 }
 
 
-void exibir_menu_quartos() {
-    int opcao;
-    do {
-        limpar_tela();
-        mostrar_titulo();
-        printf("\n\tQUARTOS\n\n");
-        printf("\t\t (2) EDITAR DADOS DO QUARTO\n");
-        printf("\t\t   (4) BUSCAR QUARTO\n\n");
-        printf("\t\t    (4) LISTAR QUARTOS\n\n");
-        printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
-        scanf(" %d", &opcao);
 
-        switch (opcao) {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                limpar_tela();
-                break;
-            case 0:
-                return;
-            default:
-                printf("\n\nOPCAO INVALIDA!\n\n");
-                pausa();
-                break;
-        }
-    } while (opcao != 0);
-}
-
-void exibir_menu_servicos() {
-    int opcao;
-    do {
-        limpar_tela();
-        mostrar_titulo();
-
-        printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
-        scanf(" %d", &opcao);
-
-        switch (opcao) {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                limpar_tela();
-                break;
-            case 0:
-                return;
-            default:
-                printf("\n\nOPCAO INVALIDA!\n\n");
-                pausa();
-                break;
-        }
-    } while (opcao != 0);
-}
 
 void exibir_menu_configuracoes() {
     int opcao;

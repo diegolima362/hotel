@@ -209,22 +209,50 @@ db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *
 }
 
 int
-db_listar_reservas(char *column, char *filter, int ativa, int limit, char *order_by, void *ids,
+db_listar_reservas(char *column, char *filter, int limit, char *order_by, void *ids,
                    int (*callback)(void *, int, char **, char **)) {
 
-    char *sql = (char *) malloc(sizeof(char) * 500);
+    char *sql = (char *) malloc(sizeof(char) * 1000);
     char char_limit[5];
 
     strcpy(sql,
-           "SELECT count(id), group_concat(id, ','), group_concat(concat, '\t\t-----------------------------------------------\n\t\t') as result "
+           "SELECT count(id), group_concat(id, ','), group_concat(concat, '\n\t\t-----------------------------------------------\n\t\t') as result "
            "FROM (SELECT id, 'RESERVA: ' || id || '\n\t\t' || 'CLIENTE: ' || id_cliente || '\n\t\t' || 'QUARTO: ' || id_quarto || '\n\t\t' || "
-           "'INICIO: ' || inicio || '\n\t\t' || 'FIM: ' || fim as concat FROM reservas ");
+           "'INICIO: ' || inicio || '\n\t\t' || 'FIM: ' || fim as concat FROM reservas");
 
-    if (strcmp(column, "NULL") != 0) {
+    if (strcmp(column, "inativa") == 0) {
+        strcat(sql, "_inativas ");
+
+    } else if (strcmp(column, "NULL") != 0) {
         strcat(sql, " where ");
-        strcat(sql, column);
-        strcat(sql, "= ");
-        strcat(sql, filter);
+
+        if (strcmp(column, "data") == 0) {
+            char inicio[15], fim[15];
+            char *pt = strtok(filter, ",");
+
+            strcpy(inicio, pt);
+            pt = strtok(NULL, "\0");
+            strcpy(fim, pt);
+
+            strcat(sql, " (inicio <= '");
+            strcat(sql, inicio);
+            strcat(sql, "' AND fim >= '");
+            strcat(sql, inicio);
+            strcat(sql, "') OR (inicio < '");
+            strcat(sql, fim);
+            strcat(sql, "' AND fim >= '");
+            strcat(sql, fim);
+            strcat(sql, "') OR ('");
+            strcat(sql, inicio);
+            strcat(sql, "' <= inicio AND '");
+            strcat(sql, fim);
+            strcat(sql, "' >= inicio) ");
+
+        } else {
+            strcat(sql, column);
+            strcat(sql, "= ");
+            strcat(sql, filter);
+        }
     }
 
     if (order_by != NULL) {
@@ -241,8 +269,6 @@ db_listar_reservas(char *column, char *filter, int ativa, int limit, char *order
     strcat(sql, ");");
 
     int qtd_resultados = executar_sql(sql, callback, ids);
-
-    free(sql);
 
     return qtd_resultados;
 }
@@ -274,10 +300,12 @@ int get_qtd_reservas() {
     return total;
 }
 
-int db_remover_cliente(char *column, char *filter) {
+int db_remover_dado(char *table, char *column, char *filter) {
     char *sql = (char *) malloc(sizeof(char) * 150);
 
-    strcpy(sql, "delete from clientes where ");
+    strcpy(sql, "delete from ");
+    strcat(sql, table);
+    strcat(sql, " where ");
 
     if (strcmp(column, "id") == 0) {
         strcat(sql, column);
@@ -298,16 +326,16 @@ int db_remover_cliente(char *column, char *filter) {
     return 0;
 }
 
-int remover_reserva(char *column, char *filter) {
+int db_remover_reserva(char *id) {
     char *sql = (char *) malloc(sizeof(char) * 150);
 
     strcpy(sql, "insert into reservas_inativas select * from reservas where id = ");
-    strcat(sql, filter);
+    strcat(sql, id);
     strcat(sql, " ;");
     executar_sql(sql, NULL, NULL);
 
     strcpy(sql, "delete from reservas where id = ");
-    strcat(sql, filter);
+    strcat(sql, id);
     strcat(sql, " ;");
     executar_sql(sql, NULL, NULL);
 

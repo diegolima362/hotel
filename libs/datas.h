@@ -71,3 +71,5 @@ void mostrar_hora(struct tm *hora);
 void mostrar_data(struct tm *date);
 
 void mostrar_data_hora();
+
+void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final);

@@ -44,36 +44,30 @@ int is_in(int valor, const int *array, int tamanho) {
 
 void mostrar_titulo() {
     limpar_tela();
+    limpar_tela();
     printf("\n\n\t\t---- CAMPINA  COMFORT  PREMIUM ----\n\t\t\t  ");
     mostrar_data_hora();
     puts("\n");
 }
 
-char * strrstr( char *s1, char * s2 )
-{
-    char * ss1;
-    char * sss1;
-    char * sss2;
+char *strrstr(char *s1, char *s2) {
+    char *ss1;
+    char *sss1;
+    char *sss2;
 
-    if( *( s2 ) == '\0' )
-    {
+    if (*(s2) == '\0') {
         return s1;
     }
 
-    ss1 = s1 + strlen( s1 );
+    ss1 = s1 + strlen(s1);
 
-    while( ss1 != s1 )
-    {
+    while (ss1 != s1) {
         --ss1;
 
-        for( sss1 = ss1, sss2 = s2; ; )
-        {
-            if( *( sss1++ ) != *( sss2++ ) )
-            {
+        for (sss1 = ss1, sss2 = s2;;) {
+            if (*(sss1++) != *(sss2++)) {
                 break;
-            }
-            else if ( * sss2 == '\0' )
-            {
+            } else if (*sss2 == '\0') {
                 return ss1;
             }
         }

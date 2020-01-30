@@ -67,11 +67,9 @@ void exibir_menu_gerenciar_clientes() {
                 exibir_menu_remover_cliente();
                 break;
             case 4:
-                limpar_tela();
                 visualizar_clientes(exibir_menu_buscar_clientes);
                 break;
             case 5:
-                limpar_tela();
                 visualizar_clientes(exibir_menu_listar_clientes);
                 break;
             case 0:
@@ -191,7 +189,7 @@ int exibir_menu_buscar_clientes(char *filter, char *value) {
     int ativo = 0;
 
     while (1) {
-        limpar_tela();
+        mostrar_titulo();
         printf("\n\tBUSCAR CLIENTE\n\n");
         printf("\t\t(1) BUSCAR POR NOME\n\n");
         printf("\t\t  (2) BUSCAR POR CPF\n\n");
@@ -311,7 +309,7 @@ int montar_cliente_sql(void *ptr, int qtd_colunas, char **valor_na_coluna, char 
 }
 
 void pegar_dados_cliente(CLIENTE *c) {
-    limpar_tela();
+    mostrar_titulo();
     printf("\n\n\t\t\t-------- ADICIONAR DADOS DO CLIENTE --------\n\n");
     printf("\n\n\t\tNOME DO CLIENTE: ");
     limpar_teclado();
@@ -418,7 +416,7 @@ void visualizar_clientes(int (*pFunction)(char *, char *)) {
 void remover_cliente_id(int id) {
     char id_char[5];
     snprintf(id_char, 5, "%d", id);
-    db_remover_cliente("id", id_char);
+    db_remover_dado("clientes", "id", id_char);
 }
 
 int selecionar_cliente(int (*pFunction)(char *, char *), CLIENTE *cliente) {
@@ -489,7 +487,7 @@ void editar_dados_cliente(CLIENTE *c) {
         formatar_update_cliente(c, sql);
         executar_sql(sql, NULL, NULL);
 
-        limpar_tela();
+        mostrar_titulo();
         printf("\n\t\tFINALIZADO\n");
         pausa();
     } else if (op == 2) {

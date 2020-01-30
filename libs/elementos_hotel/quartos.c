@@ -16,10 +16,64 @@
 
 #define LIMIT_BUSCA 100
 
+#define SQL_SIZE 300
+
+void checar_quarto_disponivel();
+
+void formatar_quartos_disponiveis(char *sql, char *tipo, char *inicio, char *fim);
+
+void exibir_menu_quartos() {
+    int opcao;
+
+    do {
+        mostrar_titulo();
+        printf("\n\tQUARTOS\n\n");
+        printf("\t\t (1) CHECAR QUARTO DISPONIVEL\n");
+        printf("\t\t   (2) BUSCAR QUARTO\n\n");
+        printf("\t\t    (3) LISTAR QUARTOS\n\n");
+        printf("\n\t\t(0) VOLTAR\n");
+        printf("\n\t\tOPÇÃO: ");
+        scanf(" %d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                checar_quarto_disponivel();
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                limpar_tela();
+                break;
+            case 0:
+                return;
+            default:
+                printf("\n\nOPCAO INVALIDA!\n\n");
+                pausa();
+                break;
+        }
+    } while (opcao != 0);
+}
+
+void checar_quarto_disponivel() {
+    struct tm inicio, fim;
+    int tipo;
+
+    tipo = selecionar_tipo_quarto();
+    if (tipo == 0)
+        return;
+
+    inserir_data_reserva(&inicio, &fim);
+    mostrar_quartos_disponiveis(&inicio,&fim,tipo,NULL);
+
+}
+
 void formatar_quartos_disponiveis(char *sql, char *tipo, char *inicio, char *fim) {
     strcpy(sql,
            "SELECT count(id), group_concat(id, ','), 'TIPO: ' || descricao, 'VALOR: ' || valor, 'QUARTOS: \n\t\t[ ' || group_concat(id, ' ][ ') || ' ]'");
     strcat(sql, "FROM (SELECT q.id, q.valor, q.descricao FROM quartos q ");
+
     if (tipo != NULL) {
         strcat(sql, " WHERE q.tipo = ");
         strcat(sql, tipo);
@@ -43,12 +97,15 @@ void formatar_quartos_disponiveis(char *sql, char *tipo, char *inicio, char *fim
 
 int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, int tipo, int *ids) {
     char inicio[15], fim[15], tipo_quarto[3];
-    char sql[500];
+    char sql[SQL_SIZE];
 
     formatar_data_sql(data_inicio, inicio);
     formatar_data_sql(data_final, fim);
+
     snprintf(tipo_quarto, 3, "%d", tipo);
+
     formatar_quartos_disponiveis(sql, tipo_quarto, inicio, fim);
+
     int qtd = executar_sql(sql, exibir_resultados, ids);
 
     return qtd;

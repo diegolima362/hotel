@@ -39,23 +39,23 @@ char *formatar_insert_reserva(RESERVA *r, char *sql);
 
 void formatar_update_reservas(RESERVA *r, char *sql);
 
-void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final);
-
 int pegar_data_reserva(RESERVA *r);
-
-int busca_reserva(char *coluna, char *valor, int *ids);
 
 int pegar_cliente_reserva(RESERVA *r);
 
 int pegar_quarto_reserva(RESERVA *r);
 
-
 void alocar_cliente_reserva(int cliente, int reserva, int quarto);
 
 int testar_reserva_ativa(int cliente);
 
+void montar_reserva_busca(int id, RESERVA *reserva);
+
+int montar_reserva_sql(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
+
+
 void teste_reserva() {
-    registrar_reserva();
+    exibir_menu_gerenciar_reservas();
 }
 
 void exibir_menu_gerenciar_reservas() {
@@ -63,7 +63,7 @@ void exibir_menu_gerenciar_reservas() {
 
     do {
         mostrar_titulo();
-        printf("\n\n\t\tRESERVAS\n\n");
+        printf("\n\t\tRESERVAS\n\n");
         printf("\t\t(1) REGISTRAR RESERVA\n\n");
         printf("\t\t (2) EDITAR RESERVA\n\n");
         printf("\t\t  (3) FINALIZAR RESERVA\n\n");
@@ -84,12 +84,10 @@ void exibir_menu_gerenciar_reservas() {
                 exibir_menu_remover_reserva();
                 break;
             case 4:
-                limpar_tela();
-                selecionar_reserva(exibir_menu_buscar_reservas, NULL);
+                visualizar_reservas(exibir_menu_buscar_reservas);
                 break;
             case 5:
-                limpar_tela();
-                selecionar_reserva(exibir_menu_listar_reservas, NULL);
+                visualizar_reservas(exibir_menu_listar_reservas);
                 break;
             case 0:
                 return;
@@ -129,7 +127,7 @@ void registrar_reserva() {
     while (1) {
         mostrar_titulo();
 
-        printf("\n\n\t\tREGISTRAR RESERVA\n");
+        printf("\n\t\tREGISTRAR RESERVA\n");
         exibir_struct_reserva(&r);
 
         printf("\n\n\t\t(1) CONFIRMAR DADOS");
@@ -182,7 +180,7 @@ void exibir_menu_editar_reserva() {
 
     do {
         mostrar_titulo();
-        printf("\n\n\t\tEDITAR RESERVA\n\n");
+        printf("\n\t\tEDITAR RESERVA\n\n");
         printf("\t\t(1) BUSCAR RESERVA PARA EDICAO\n");
         printf("\t\t (2) LISTAR RESERVAS\n");
         printf("\t\t  (3) INSERIR ID DA RESERVA\n");
@@ -224,10 +222,10 @@ void exibir_menu_remover_reserva() {
     int id;
     do {
         mostrar_titulo();
-        printf("\n\n\t\tREMOVER CLIENTE\n\n");
-        printf("\t\t(1) BUSCAR CLIENTES PARA REMOCAO\n");
-        printf("\t\t (2) LISTAR CLIENTES PARA REMOCAO\n");
-        printf("\t\t  (3) INSERIR ID DO CLIENTE\n\n");
+        printf("\n\n\t\tREMOVER RESERVA\n\n");
+        printf("\t\t(1) BUSCAR RESERVA PARA REMOCAO\n\n");
+        printf("\t\t (2) LISTAR RESERVA PARA REMOCAO\n\n");
+        printf("\t\t  (3) INSERIR ID DA RESERVA\n\n");
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPÇÃO: ");
         scanf(" %d", &opcao);
@@ -263,47 +261,59 @@ void exibir_menu_remover_reserva() {
 
 int exibir_menu_buscar_reservas(char *filter, char *value) {
     int opcao;
-    char dado_busca[50];
-    int ativo = 0;
+    char dado_busca[50], aux[50];
+    struct tm inicio, fim;
+    int id;
 
     while (1) {
-        limpar_tela();
-        printf("\n\tBUSCAR RESERVA\n\n");
-        printf("\t\t(1) BUSCAR POR CLIENTE DA RESERVA\n");
-        printf("\t\t  (2) BUSCAR POR QUARTO DA RESERVA\n");
-        printf("\t\t    (3) BUSCAR POR DATA DA RESERVA\n");
-        printf("\t\t      (4) BUSCAR POR ID DA RESERVA\n");
-        printf("\n\t\t(0) VOLTAR\n");
+        mostrar_titulo();
+        printf("\n\t\tBUSCAR RESERVA\n\n");
+        printf("\t\t(1) BUSCAR POR ID\n\n");
+        printf("\t\t (2) BUSCAR POR DATA\n\n");
+        printf("\t\t  (3) BUSCAR POR QUARTO\n\n");
+        printf("\t\t   (4) BUSCAR POR CLIENTE\n\n");
+        printf("\n\t\t(0) VOLTAR\n\n");
         printf("\n\t\tOPÇÃO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
             case 1:
-                printf("\n\t\tINSIRA O NOME: ");
-                limpar_teclado();
-                fgets(dado_busca, 50, stdin);
-                remover_quebra(dado_busca);
-                strcpy(filter, "nome");
-                strcpy(value, dado_busca);
-                return 1;
-            case 2:
-                printf("\n\t\tINSIRA O CPF: ");
-                limpar_teclado();
-                fgets(dado_busca, 50, stdin);
-                remover_quebra(dado_busca);
-                strcpy(filter, "cpf");
-                strcpy(value, dado_busca);
-                return 1;
-            case 3:
-                printf("\n\t\tINSIRA O ID: ");
-                limpar_teclado();
-                fgets(dado_busca, 50, stdin);
-                remover_quebra(dado_busca);
+                printf("\n\n\t\tINSIRA O ID: ");
+                scanf(" %d", &id);
+                snprintf(dado_busca, 10, "%d", id);
                 strcpy(filter, "id");
                 strcpy(value, dado_busca);
                 return 1;
+
+            case 2:
+                inserir_data_reserva(&inicio, &fim);
+                formatar_data_sql(&inicio, dado_busca);
+                formatar_data_sql(&fim, aux);
+                strcat(dado_busca, ",");
+                strcat(dado_busca, aux);
+                strcpy(filter, "data");
+                strcpy(value, dado_busca);
+                return 1;
+
+            case 3:
+                printf("\n\t\tINSIRA O NUMERO DO QUARTO: ");
+                limpar_teclado();
+                fgets(dado_busca, 50, stdin);
+                remover_quebra(dado_busca);
+                strcpy(filter, "id_quarto");
+                strcpy(value, dado_busca);
+                return 1;
+
+            case 4:
+                id = buscar_clientes();
+                snprintf(dado_busca, 10, "%d", id);
+                strcpy(filter, "id_cliente");
+                strcpy(value, dado_busca);
+                return 1;
+
             case 0:
                 return 0;
+
             default:
                 printf("\n\nOPCAO INVALIDA!\n\n");
                 pausa();
@@ -315,10 +325,9 @@ int exibir_menu_listar_reservas(char *column, char *filter) {
     int opcao;
     while (1) {
         mostrar_titulo();
-        printf("\n\n\t\tLISTAR CLIENTES\n\n");
-        printf("\t\t(1) LISTAR TODOS OS CLIENTES REGISTRADOS\n");
-        printf("\n\t\t (2) LISTAR CLIENTES COM RESERVA ATIVA\n");
-        printf("\n\t\t  (3) LISTAR CLIENTES SEM RESERVA ATIVA\n\n");
+        printf("\n\n\t\tLISTAR RESERVAS\n\n");
+        printf("\n\t\t(1) LISTAR RESERVAS ATIVAS\n");
+        printf("\n\t\t (2) LISTAR RESERVAS FINALIZADAS\n\n");
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPÇÃO: ");
         scanf(" %d", &opcao);
@@ -329,12 +338,8 @@ int exibir_menu_listar_reservas(char *column, char *filter) {
                 strcpy(filter, "NULL");
                 return 1;
             case 2:
-                strcpy(column, "id_reserva!");
-                strcpy(filter, "0");
-                return 1;
-            case 3:
-                strcpy(column, "id_reserva");
-                strcpy(filter, "0");
+                strcpy(column, "inativa");
+                strcpy(filter, "NULL");
                 return 1;
             case 0:
                 return 0;
@@ -364,7 +369,7 @@ void visualizar_reservas(int (*pFunction)(char *, char *)) {
         if (id == 0)
             break;
 
-        printf("\n\t\t(1) EDITAR CLIENTE (2) REMOVER CLIENTE (3) VOLTAR (0) SAIR\n\t\tOPCAO: ");
+        printf("\n\t\t(1) EDITAR RESERVA (2) REMOVER RESERVA (3) VOLTAR (0) SAIR\n\t\tOPCAO: ");
         scanf(" %d", &op);
 
         if (op == 1)
@@ -380,7 +385,11 @@ void visualizar_reservas(int (*pFunction)(char *, char *)) {
 void remover_reserva_id(int id) {
     char id_char[5];
     snprintf(id_char, 5, "%d", id);
-    db_remover_cliente("id", id_char);
+    db_remover_reserva(id_char);
+
+    mostrar_titulo();
+    printf("\n\n\t\t\tRESERVA REMOVIDA\n");
+    pausa();
 }
 
 int selecionar_reserva(int (*pFunction)(char *, char *), RESERVA *reserva) {
@@ -393,11 +402,16 @@ int selecionar_reserva(int (*pFunction)(char *, char *), RESERVA *reserva) {
         mostrar_titulo();
         puts("\n\n\t\tRESULTADOS\n\n");
 
-        int total_resultados = db_listar_reservas(column, filter, 0, LIMIT_BUSCA, "nome", ids_encontrados,
+        int total_resultados = db_listar_reservas(column, filter, LIMIT_BUSCA, "id", ids_encontrados,
                                                   exibir_resultados);
+
 
         if (total_resultados == 0) {
             printf("\n\n\t\tNENHUM RESULTADO ENCONTRADO\n");
+            pausa();
+            return 0;
+
+        } else if (strcmp(column, "inativa") == 0) {
             pausa();
             return 0;
 
@@ -413,10 +427,10 @@ int selecionar_reserva(int (*pFunction)(char *, char *), RESERVA *reserva) {
                 if (is_in(id, ids_encontrados, total_resultados + 1)) {
                     int confirm;
 
-                    limpar_tela();
-//                    montar_cliente_busca(id, reserva);
+                    mostrar_titulo();
+                    montar_reserva_busca(id, reserva);
 
-                    printf("\n\n\t\t(1) CONFIRMAR CLIENTE (0) VOLTAR :  ");
+                    printf("\n\n\t\t(1) CONFIRMAR RESERVA (0) VOLTAR :  ");
                     scanf(" %d", &confirm);
 
                     return confirm == 1 ? id : selecionar_reserva(pFunction, NULL);
@@ -429,6 +443,7 @@ int selecionar_reserva(int (*pFunction)(char *, char *), RESERVA *reserva) {
             }
         }
     }
+
     return 0;
 }
 
@@ -479,7 +494,7 @@ void editar_dados_reserva(RESERVA *r) {
         formatar_update_reservas(r, sql);
         executar_sql(sql, NULL, NULL);
 
-        limpar_tela();
+        mostrar_titulo();
         printf("\n\t\tFINALIZADO\n");
         pausa();
     } else if (op == 2) {
@@ -535,24 +550,6 @@ void formatar_update_reservas(RESERVA *r, char *sql) {
     snprintf(str, 10, "%d", r->id);
     strcat(sql, str);
     strcat(sql, ";");
-
-}
-
-void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final) {
-    do {
-        printf("\n\n\t\tDATA DE ENTRADA (EX.: DD-MM-AAAA): ");
-        scanf(" %d %d %d", &data_inicio->tm_mday, &data_inicio->tm_mon, &data_inicio->tm_year);
-
-        printf("\n\t\tDATA DE SAIDA (EX.: DD-MM-AAAA): ");
-        scanf(" %d %d %d", &data_final->tm_mday, &data_final->tm_mon, &data_final->tm_year);
-
-        if (validar_periodo(data_inicio, data_final) == 0) {
-            printf("\n\n\t\tDATA OU PERIODO INVALIDO\n");
-            pausa();
-        } else
-            break;
-
-    } while (1);
 
 }
 
@@ -709,12 +706,6 @@ int pegar_cliente_reserva(RESERVA *r) {
 
 }
 
-int busca_reserva(char *coluna, char *valor, int *ids) {
-    int qtd_resultados;
-    qtd_resultados = db_listar_clientes(coluna, valor, -1, NULL, ids, exibir_resultados);
-    return qtd_resultados;
-}
-
 int testar_reserva_ativa(int cliente) {
     char sql[200];
     char str[10];
@@ -728,4 +719,50 @@ int testar_reserva_ativa(int cliente) {
     executar_sql(sql, montar_qtd, &reserva);
 
     return reserva;
+}
+
+void montar_reserva_busca(int id, RESERVA *reserva) {
+    RESERVA r;
+    char id_char[6];
+    snprintf(id_char, 6, "%d", id);
+
+    db_listar_reservas("id", id_char, 1, "id", &r, montar_reserva_sql);
+    exibir_struct_reserva(&r);
+
+    if (reserva != NULL)
+        *reserva = r;
+}
+
+int montar_reserva_sql(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna) {
+    if (ptr == NULL) return -1;
+
+    RESERVA *r = (RESERVA *) ptr;
+    char reserva[10][50] = {0};
+    int index = 0;
+    char *pt;
+
+    pt = strtok(valor_na_coluna[2], " ");
+
+    while (pt != NULL) {
+        pt = strtok(NULL, "\n\t\t");
+        strcpy(reserva[index], pt);
+        index++;
+        pt = strtok(NULL, " ");
+    }
+
+    int id_tmp;
+
+    id_tmp = (int) strtol(reserva[0], NULL, 10);
+    r->id = id_tmp;
+
+    id_tmp = (int) strtol(reserva[1], NULL, 10);
+    r->id_cliente = id_tmp;
+
+    id_tmp = (int) strtol(reserva[2], NULL, 10);
+    r->id_quarto = id_tmp;
+
+    formatar_data_struct(&r->inicio, reserva[3]);
+    formatar_data_struct(&r->fim, reserva[4]);
+
+    return 0;
 }

@@ -32,16 +32,16 @@ db_listar_quartos_reservar(char *inicio, char *fim, int ocupado, void *ids,
 int db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *ids,
                        int (*callback)(void *, int, char **, char **));
 
-int db_listar_reservas(char *column, char *filter, int ativa, int limit, char *order_by, void *ids,
+int db_listar_reservas(char *column, char *filter, int limit, char *order_by, void *ids,
                        int (*callback)(void *, int, char **, char **));
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2);
 
 int get_qtd_reservas();
 
-int db_remover_cliente(char *column, char *filter);
+int db_remover_dado(char *table, char *column, char *filter);
 
-int remover_reserva(char *column, char *filter);
+int db_remover_reserva(char *id);
 
 int reservar_quarto(int id_quarto, int id_reserva);
 
