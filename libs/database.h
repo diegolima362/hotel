@@ -10,7 +10,7 @@
 #include <time.h>
 
 #define DB_PATH "data/hotel.db"
-#define str_null "NULL"
+#define BKP_DB_PATH "data/hotel_bkp.db"
 
 typedef struct quarto {
     int id;
@@ -19,15 +19,13 @@ typedef struct quarto {
     float valor;
 } QUARTO;
 
+int criar_banco_de_dados();
+
 int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr);
 
-int criar_banco();
+int criar_tabelas();
 
 int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2);
-
-int
-db_listar_quartos_reservar(char *inicio, char *fim, int ocupado, void *ids,
-                           int (*callback)(void *, int, char **, char **));
 
 int db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *ids,
                        int (*callback)(void *, int, char **, char **));
@@ -47,6 +45,18 @@ int reservar_quarto(int id_quarto, int id_reserva);
 
 int gerar_id(char *tabela, int *id);
 
-int get_id_cliente();
-
 int testar_id(int id, char *table);
+
+void bkp_db(int isSave);
+
+void db_listar_dados_registrados();
+
+void db_listar_clientes_detalhado();
+
+void db_listar_quartos_detalhado();
+
+int check_bkp_file();
+
+void db_deletar_dados();
+
+void db_reset_db();

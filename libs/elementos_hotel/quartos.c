@@ -6,7 +6,6 @@
 #include "../datas.h"
 
 #include <bits/types/struct_tm.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -16,21 +15,23 @@
 
 #define LIMIT_BUSCA 100
 
-#define SQL_SIZE 300
+#define SQL_SIZE 500
 
 void checar_quarto_disponivel();
 
 void formatar_quartos_disponiveis(char *sql, char *tipo, char *inicio, char *fim);
 
-void exibir_menu_quartos() {
+void listar_quartos();
+
+void exibir_menu_gerenciar_quartos() {
     int opcao;
 
     do {
         mostrar_titulo();
-        printf("\n\tQUARTOS\n\n");
-        printf("\t\t (1) CHECAR QUARTO DISPONIVEL\n");
-        printf("\t\t   (2) BUSCAR QUARTO\n\n");
-        printf("\t\t    (3) LISTAR QUARTOS\n\n");
+        printf("\n\t\tQUARTOS\n\n");
+        printf("\t\t(1) CHECAR QUARTO DISPONIVEL\n\n");
+        printf("\t\t (2) LISTAR QUARTOS\n\n");
+        printf("\t\t  (3) EDITAR PRECO DOS QUARTOS\n\n");
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPÇÃO: ");
         scanf(" %d", &opcao);
@@ -40,6 +41,9 @@ void exibir_menu_quartos() {
                 checar_quarto_disponivel();
                 break;
             case 2:
+                mostrar_titulo();
+                listar_quartos();
+                pausa();
                 break;
             case 3:
                 break;
@@ -56,17 +60,36 @@ void exibir_menu_quartos() {
     } while (opcao != 0);
 }
 
+void listar_quartos() {
+    char sql[SQL_SIZE];
+    int ids[LIMIT_BUSCA];
+    char char_tipo[3];
+    puts("\n\n\t\t--------------------------------------------------------------------\n");
+    for (int i = 1; i <= 7; i++) {
+        strcpy(sql,
+               "SELECT count(id), group_concat(id, ','), 'TIPO: ' || descricao, 'VALOR: ' || valor, 'QUARTOS: \n\t\t[ ' || group_concat(id, ' ][ ') || ' ]'");
+        strcat(sql, "FROM (SELECT q.id, q.valor, q.descricao FROM quartos q where tipo = ");
+        snprintf(char_tipo, 3, "%d", i);
+        strcat(sql, char_tipo);
+        strcat(sql, ");");
+
+        executar_sql(sql, exibir_resultados, ids);
+        puts("\n\t\t--------------------------------------------------------------------\n");
+    }
+}
+
 void checar_quarto_disponivel() {
     struct tm inicio, fim;
     int tipo;
+    int ids[LIMIT_BUSCA] = {0};
 
     tipo = selecionar_tipo_quarto();
     if (tipo == 0)
         return;
-
+    mostrar_titulo();
     inserir_data_reserva(&inicio, &fim);
-    mostrar_quartos_disponiveis(&inicio,&fim,tipo,NULL);
-
+    mostrar_quartos_disponiveis(&inicio, &fim, tipo, ids);
+    pausa();
 }
 
 void formatar_quartos_disponiveis(char *sql, char *tipo, char *inicio, char *fim) {
@@ -106,9 +129,9 @@ int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, i
 
     formatar_quartos_disponiveis(sql, tipo_quarto, inicio, fim);
 
-    int qtd = executar_sql(sql, exibir_resultados, ids);
+    mostrar_titulo();
 
-    return qtd;
+    return executar_sql(sql, exibir_resultados, ids);
 }
 
 int selecionar_quarto(struct tm *data_inicio, struct tm *data_final, int *id_quarto) {
@@ -116,26 +139,24 @@ int selecionar_quarto(struct tm *data_inicio, struct tm *data_final, int *id_qua
     int ids_encontrados[LIMIT_BUSCA] = {0};
     int tipo;
     int op;
+    int qtd_quartos;
 
-    do {
-        limpar_tela();
-        mostrar_titulo();
-        puts("\n");
+    while (1) {
         tipo = selecionar_tipo_quarto();
-
-        limpar_tela();
-        mostrar_titulo();
-        puts("\n");
 
         if (tipo == 0)
             return 0;
-        else if (mostrar_quartos_disponiveis(data_inicio, data_final, tipo, ids_encontrados) == 0) {
+
+        qtd_quartos = mostrar_quartos_disponiveis(data_inicio, data_final, tipo, ids_encontrados);
+
+        if (qtd_quartos == 0) {
             printf("\n\n\t\tNAO EXISTEM QUARTOS DESSE TIPO DISPONIVEIS NESSA DATA\n");
             pausa();
             continue;
         }
 
         while (1) {
+
             printf("\n\n\t\tNUMERO DO QUARTO: ");
             scanf(" %d", id_quarto);
 
@@ -151,7 +172,7 @@ int selecionar_quarto(struct tm *data_inicio, struct tm *data_final, int *id_qua
                 if (op == 1)
                     return *id_quarto;
                 else if (op == 0)
-                    return 0;
+                    break;
 
             } else {
                 printf("\n\n\t\tNUMERO INVALIDO!\n");
@@ -164,15 +185,15 @@ int selecionar_quarto(struct tm *data_inicio, struct tm *data_final, int *id_qua
                 mostrar_quartos_disponiveis(data_inicio, data_final, tipo, ids_encontrados);
             }
         }
-    } while (1);
+    }
+
 }
 
 int selecionar_tipo_quarto() {
     int tipo;
     do {
-        limpar_tela();
         mostrar_titulo();
-        printf("\n\n\t\tSELECIONAR QUARTO\n");
+        printf("\n\t\tSELECIONAR QUARTO\n");
         printf("\n\t\t(7) PRESIDENCIAL\n");
         printf("\n\t\t (6) LUXO SIMPLES");
         printf("\n\t\t  (5) LUXO DUPLO");

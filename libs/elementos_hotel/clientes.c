@@ -186,7 +186,6 @@ void exibir_menu_remover_cliente() {
 int exibir_menu_buscar_clientes(char *filter, char *value) {
     int opcao;
     char dado_busca[50];
-    int ativo = 0;
 
     while (1) {
         mostrar_titulo();

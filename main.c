@@ -8,62 +8,30 @@
 #include "libs/browserdb.h"
 #include "libs/database.h"
 #include "libs/elementos_hotel/reservas.h"
+#include "libs/elementos_hotel/quartos.h"
 
 void exibir_menu_principal();
 
-void exibir_menu_quartos();
-
-void exibir_menu_servicos();
+void exibir_menu_gerenciar_servicos();
 
 void exibir_menu_configuracoes();
 
-void exibir_menu_dados_sistema();
-
-// diretorios e base de dados
-
-int criar_banco_de_dados();
+void exibir_menu_gerenciar_dados_sistema();
 
 int checar_diretorios();
-
-// menus edicao
-
-void exibir_menu_editar_cliente();
-
-
-// menus remocao
-
-void exibir_menu_remover_cliente();
-
-
-// menus listagem
-
-void exibir_menu_listar_reservas();
 
 
 int main(int argc, char *argv[]) {
 
-//    if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
-//        printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
-//        exit(0);
-//    }
-//
-//    if (autenticar()) {
-//        exibir_menu_principal();
-//    }
+    if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
+        printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
+        exit(0);
+    }
 
-    RESERVA r;
-    char sql[500];
+    if (autenticar()) {
+        exibir_menu_principal();
+    }
 
-//    r.id = 214;
-//    r.id_cliente = 5;
-//    r.id_quarto = 6;
-//    r.inicio = ler_data();
-//    r.fim = ler_data();
-//    formatar_update_reservas(&r, sql);
-
-    int ids[100];
-//    db_listar_reservas("id", "201", -1, "id", ids, exibir_resultados);
-    teste_reserva();
     return 0;
 }
 
@@ -72,15 +40,14 @@ void exibir_menu_principal() {
     int opcao;
 
     do {
-        limpar_tela();
         mostrar_titulo();
-        printf("\n\tMENU INICIAL\n");
+        printf("\n\t\tMENU INICIAL\n");
         printf("\n\t\t(1) GERENCIAR RESERVAS\n");
         printf("\n\t\t (2) GERENCIAR CLIENTES\n");
         printf("\n\t\t  (3) GERENCIAR QUARTOS\n");
         printf("\n\t\t   (4) GERENCIAR SERVICOS\n");
         printf("\n\t\t    (5) GERENCIAR DADOS DO SISTEMA\n");
-        printf("\n\t\t     (7) MANUTENCAO\n");
+        printf("\n\t\t     (6) MANUTENCAO\n");
         printf("\n\t\t(0) SAIR\n");
         printf("\n\t\tOPÇÃO: ");
         limpar_teclado();
@@ -88,53 +55,48 @@ void exibir_menu_principal() {
 
         switch (opcao) {
             case 1:
-                limpar_tela();
                 exibir_menu_gerenciar_reservas();
                 break;
             case 2:
-                limpar_tela();
                 exibir_menu_gerenciar_clientes();
                 break;
             case 3:
-                limpar_tela();
-                exibir_menu_quartos();
+                exibir_menu_gerenciar_quartos();
                 break;
             case 4:
-                limpar_tela();
-                exibir_menu_servicos();
+                exibir_menu_gerenciar_servicos();
                 break;
             case 5:
-                limpar_tela();
-                exibir_menu_dados_sistema();
+                exibir_menu_gerenciar_dados_sistema();
+                break;
+            case 6:
+                exibir_menu_configuracoes();
                 break;
             case 0:
-                limpar_tela();
-                printf("SAINDO...\n\n");
+                mostrar_titulo();
+                printf("\n\n\t\tSAINDO...\n\n");
                 exit(0);
 
             default:
-                printf("\n\nOPCAO INVALIDA!\n\n");
+                printf("\n\n\t\tOPCAO INVALIDA!\n\n");
                 pausa();
                 break;
         }
     } while (opcao != 0);
 }
 
-
-
-
 void exibir_menu_configuracoes() {
     int opcao;
 
     do {
-        limpar_tela();
         mostrar_titulo();
-        printf("\n\tMANUTENCAO\n");
-        printf("\n\t\t(1) ALTERAR LOGIN\n");
-        printf("\t\t  (2) FAZER BACKUP DOS ARQUIVOS\n");
-        printf("\t\t    (3) REMOVER TODOS OS DADOS DO SISTEMA\n");
-        printf("\t\t      (4) RESTAURAR BACKUP\n");
-        printf("\t\t        (5) REMOVER BACKUP\n");
+        printf("\n\t\tMANUTENCAO\n");
+        printf("\n\t\t(1) ALTERAR LOGIN\n\n");
+        printf("\t\t (2) FAZER BACKUP DOS ARQUIVOS\n\n");
+        printf("\t\t  (3) REMOVER TODOS OS DADOS DO SISTEMA\n\n");
+        printf("\t\t   (4) RESTAURAR BACKUP\n\n");
+        printf("\t\t    (5) REMOVER BACKUP\n\n");
+        printf("\t\t     (6) REINICIAR BANCO DE DADOS\n");
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPÇÃO: ");
 
@@ -145,20 +107,62 @@ void exibir_menu_configuracoes() {
             case 1:
                 alterar_login();
                 break;
+
             case 2:
+                mostrar_titulo();
+                if (check_bkp_file()) {
+                    printf("\n\t\tSUBSTITUIR BACKUP ANTERIOR\n\t\t(1) CONFIRMAR (0) CANCELAR : ");
+                    scanf(" %d", &opcao);
 
+                    if (opcao == 1) {
+                        bkp_db(1);
+                        puts("\n\t\tBACKUP REALIZADO\n");
+
+                    } else puts("\n\t\tBACKUP NAO REALIZADO\n");
+                }
+                pausa();
                 break;
+
             case 3:
-
+                mostrar_titulo();
+                printf("\n\n\t\tTODOS OS DADOS SERAO APAGADOS\n\t\t(1) CONFIRMAR (0) CANCELAR : ");
+                scanf(" %d", &opcao);
+                if (opcao == 1) db_deletar_dados();
                 break;
+
             case 4:
-
+                mostrar_titulo();
+                if (check_bkp_file()) {
+                    bkp_db(0);
+                    puts("\n\t\tBACKUP RESTAURADO\n");
+                } else {
+                    puts("\n\t\tNAO FOI REALIZADO BACKUP ANTERIORMENTE\n");
+                }
+                pausa();
                 break;
+
             case 5:
-
+                mostrar_titulo();
+                if (check_bkp_file()) {
+                    printf("\n\n\t\tO BACKUP SERA APAGADO\n\t\t(1) CONFIRMAR (0) CANCELAR : ");
+                    scanf(" %d", &opcao);
+                    if (opcao == 1) bkp_db(-1);
+                } else {
+                    puts("\n\t\tNAO FOI REALIZADO BACKUP ANTERIORMENTE\n");
+                }
+                pausa();
                 break;
+
+            case 6:
+                mostrar_titulo();
+                printf("\n\n\t\tTODOS OS DADOS SERAO APAGADOS\n\t\t(1) CONFIRMAR (0) CANCELAR : ");
+                scanf(" %d", &opcao);
+                if (opcao == 1) db_reset_db();
+                break;
+
             case 0:
                 return;
+
             default:
                 printf("\n\nOPCAO INVALIDA!\n\n");
                 pausa();
@@ -168,29 +172,33 @@ void exibir_menu_configuracoes() {
 
 }
 
-void exibir_menu_dados_sistema() {
+void exibir_menu_gerenciar_dados_sistema() {
     int opcao;
     do {
-        limpar_tela();
         mostrar_titulo();
-        printf("\n\tDADOS DO SISTEMA\n");
-        printf("\n\t\t(1) QUANTIDADE DE RESERVAS ATIVAS \n");
-        printf("\t\t  (2) HISTORICO DE HOSPEDES\n");
-        printf("\t\t   (3) LISTAR QUARTOS\n");
+        printf("\n\t\tDADOS DO SISTEMA\n\n");
+        printf("\n\t\t(1) ESTATISTICAS DE DADOS REGISTRADOS\n\n");
+        printf("\t\t (2) HISTORICO DE HOSPEDES\n\n");
+        printf("\t\t  (3) LISTAR QUARTOS RESERVADOS\n");
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPÇÃO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
             case 1:
+                mostrar_titulo();
+                db_listar_dados_registrados();
+                pausa();
                 break;
             case 2:
+                mostrar_titulo();
+                db_listar_clientes_detalhado();
+                pausa();
                 break;
             case 3:
-                break;
-            case 4:
-                break;
-            case 5:
+                mostrar_titulo();
+                db_listar_quartos_detalhado();
+                pausa();
                 break;
             case 0:
                 return;
@@ -200,27 +208,6 @@ void exibir_menu_dados_sistema() {
                 break;
         }
     } while (opcao != 0);
-}
-
-// menus de busca
-
-
-
-// diretorios e base de dados
-
-int criar_banco_de_dados() {
-    FILE *db = fopen(DB_PATH, "r+b");
-    int criacao__banco_dados = 0;
-
-    if (db == NULL) {
-        db = fopen(DB_PATH, "w+b");
-        fclose(db);
-        printf("\n\n\t\tCRIANDO BANCO DE DADOS ... \n");
-        criar_banco();
-        criacao__banco_dados = 1;
-    } else { fclose(db); }
-
-    return criacao__banco_dados;
 }
 
 int checar_diretorios() {

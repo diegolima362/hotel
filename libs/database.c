@@ -3,10 +3,36 @@
 //
 #include "database.h"
 #include "datas.h"
+#include "extrafuncs.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <sqlite3.h>
+
+/*
+ * author: https://www.sqlite.org/backup.html
+ */
+int loadOrSaveDb(sqlite3 *pInMemory, const char *zFilename, int isSave);
+
+int criar_banco_de_dados() {
+    FILE *db = fopen(DB_PATH, "r+b");
+    int criacao__banco_dados = 0;
+
+    if (db == NULL) {
+
+        db = fopen(DB_PATH, "w+b");
+
+        fclose(db);
+
+        printf("\n\n\t\tCRIANDO BANCO DE DADOS ... \n");
+        criar_tabelas();
+
+        criacao__banco_dados = 1;
+
+    } else { fclose(db); }
+
+    return criacao__banco_dados;
+}
 
 int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr) {
     char *error_msg;
@@ -29,7 +55,6 @@ void criar_quartos(int n, char *sql, sqlite3 *db) {
 
 void gerar_dados(sqlite3 *db) {
     sqlite3_open(DB_PATH, &db);
-    char *error_msg, *error_msg1;
 
     puts("QUARTOS ...");
     criar_quartos(20, "insert into quartos values (null, 1, 'Executivo triplo', 440);", db);
@@ -43,7 +68,7 @@ void gerar_dados(sqlite3 *db) {
 
 }
 
-int criar_banco() {
+int criar_tabelas() {
     char *error_msg, *error_msg1, *error_msg2;
     sqlite3 *db;
     sqlite3_open(DB_PATH, &db);
@@ -109,44 +134,6 @@ int mostrar_resultados(void *ptr, int resultados, char **STR1, char **STR2) {
     putchar('\n');
 
     return 0;
-}
-
-int
-db_listar_quartos_reservar(char *inicio, char *fim, int ocupado, void *ids,
-                           int (*callback)(void *, int, char **, char **)) {
-
-    char *sql = (char *) malloc(sizeof(char) * 500);
-    char char_limit[5];
-
-    strcpy(sql,
-           "SELECT count(id), group_concat(id, ','), 'TIPO: ' || descricao, 'VALOR: ' || valor, 'QUARTOS: ' || group_concat(id, ' | ') "
-           "");
-
-    strcat(sql, "IN ( SELECT r.id_quarto FROM reservas r "
-                "JOIN quartos_reservados qr ON r.id_quarto = qr.id WHERE (inicio <= '");
-    strcat(sql, inicio);
-    strcat(sql, "' AND fim >= '");
-    strcat(sql, inicio);
-    strcat(sql, "') OR (inicio < '");
-    strcat(sql, fim);
-    strcat(sql, "' AND fim >= '");
-    strcat(sql, fim);
-    strcat(sql, "') OR ('");
-    strcat(sql, inicio);
-    strcat(sql, "' <= inicio AND '");
-    strcat(sql, fim);
-    strcat(sql, "' >= inicio));");
-
-
-    strcat(sql, ");");
-
-    int qtd_resultados = 0;// executar_sql(sql, callback, ids);
-
-    puts(sql);
-    getchar();
-    free(sql);
-
-    return qtd_resultados;
 }
 
 int
@@ -339,6 +326,11 @@ int db_remover_reserva(char *id) {
     strcat(sql, " ;");
     executar_sql(sql, NULL, NULL);
 
+    strcpy(sql, "delete from quarto_registrados where id_reserva = ");
+    strcat(sql, id);
+    strcat(sql, " ;");
+    executar_sql(sql, NULL, NULL);
+
     free(sql);
 
     return 0;
@@ -375,18 +367,6 @@ int gerar_id(char *tabela, int *id) {
     return ++(*id);
 }
 
-int get_id_cliente() {
-    int id;
-    char *sql = (char *) malloc(sizeof(char) * 150);
-
-    strcpy(sql, "SELECT id FROM clientes where clientes.id_quarto = -1;");
-
-    executar_sql(sql, montar_qtd, &id);
-    free(sql);
-
-    return id;
-}
-
 int testar_id(int id, char *table) {
     char sql[100];
     char id_char[5];
@@ -402,4 +382,136 @@ int testar_id(int id, char *table) {
 
     int resultado = executar_sql(sql, montar_qtd, ids);
     return resultado;
+}
+
+void bkp_db(int isSave) {
+    sqlite3 *db;
+
+    if (isSave == -1) {
+        remove(BKP_DB_PATH);
+        return;
+    }
+
+    if (check_bkp_file() == 0) {
+        FILE *bkp = fopen(BKP_DB_PATH, "w+b");
+        fclose(bkp);
+    }
+
+    sqlite3_open(DB_PATH, &db);
+    loadOrSaveDb(db, BKP_DB_PATH, isSave);
+    sqlite3_close(db);
+}
+
+int loadOrSaveDb(sqlite3 *pInMemory, const char *zFilename, int isSave) {
+    int rc;
+    sqlite3 *pFile;
+    sqlite3_backup *pBackup;
+    sqlite3 *pTo;
+    sqlite3 *pFrom;
+
+    rc = sqlite3_open(zFilename, &pFile);
+    if (rc == SQLITE_OK) {
+
+        pFrom = (isSave ? pInMemory : pFile);
+        pTo = (isSave ? pFile : pInMemory);
+
+        pBackup = sqlite3_backup_init(pTo, "main", pFrom, "main");
+        if (pBackup) {
+            (void) sqlite3_backup_step(pBackup, -1);
+            (void) sqlite3_backup_finish(pBackup);
+        }
+        rc = sqlite3_errcode(pTo);
+    }
+
+    (void) sqlite3_close(pFile);
+    return rc;
+}
+
+int db_exibir_resultados(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna) {
+
+    for (int i = 0; i < qtd_colunas; i++) {
+        upper(valor_na_coluna[i]);
+        printf("\t\t%s\n", valor_na_coluna[i]);
+    }
+
+    return 0;
+}
+
+void db_listar_dados_registrados() {
+    char sql[500];
+    strcpy(sql,
+           "SELECT group_concat(concat, '\t\t-----------------------------------------------\n\t\t') AS result "
+           "FROM (SELECT IFNULL(id, 0) id, 'CLIENTES REGISTRADOS: ' || count(c.id) AS concat FROM clientes c);");
+    executar_sql(sql, db_exibir_resultados, NULL);
+
+    strcpy(sql,
+           "SELECT group_concat(concat, '\t\t-----------------------------------------------\n\t\t') AS result "
+           "FROM (SELECT IFNULL(id, 0) id, 'RESERVAS ATIVAS: ' || count(r.id) AS concat FROM reservas r);");
+    executar_sql(sql, db_exibir_resultados, NULL);
+
+    strcpy(sql,
+           "SELECT group_concat(concat, '\t\t-----------------------------------------------\n\t\t') AS result "
+           "FROM (SELECT IFNULL(id, 0) id, 'RESERVAS FINALIZADAS: ' || count(r.id) AS concat FROM reservas_inativas r);");
+    executar_sql(sql, db_exibir_resultados, NULL);
+
+    strcpy(sql,
+           "SELECT group_concat(upper(concat), '\\t\\t-----------------------------------------------\\n\\t\\t') as result "
+           "FROM (SELECT 'QUARTOS COM RESERVAS ATIVAS: ' || count(ids) AS concat FROM (SELECT DISTINCT q.id_quarto as ids "
+           "FROM quartos_reservados q JOIN reservas r ON q.id_reserva=r.id));");
+    executar_sql(sql, db_exibir_resultados, NULL);
+}
+
+void db_listar_clientes_detalhado() {
+    char sql[500];
+    strcpy(sql,
+           "SELECT group_concat(concat, '\t\t-----------------------------------------------\n\t\t') as result "
+           "FROM (SELECT 'ID CLIENTE: ' || c.id || '\n\t\t' || 'NOME: ' || c.nome || ' ' || c.sobrenome || '\n\t\t' || 'QUARTO: ' || r.id_quarto ||"
+           "'\n\t\t' || 'CPF: ' || c.cpf || '\n\t\t' || 'PHONE: ' || c.phone || "
+           "r.id_quarto || '\n\t\t' || 'PERIODO DA RESERVA: ' || r.inicio || ' - ' || r.fim as concat FROM clientes c JOIN reservas r on c.id_reserva = r.id);");
+
+    executar_sql(sql, db_exibir_resultados, NULL);
+}
+
+void db_listar_quartos_detalhado() {
+    char sql[500];
+    strcpy(sql,
+           "SELECT group_concat(concat, '\t\t-----------------------------------------------\n\t\t') as result "
+           "FROM (SELECT 'NUM QUARTO: ' || q.id_quarto || '\n\t\t' || 'ID CLIENTE: ' || r.id_cliente || '\n\t\t' || 'PERIODO DA RESERVA: ' || r.inicio || ' - ' || r.fim as concat "
+           "FROM quartos_reservados q JOIN reservas r on r.id_quarto = q.id_quarto);");
+    executar_sql(sql, db_exibir_resultados, NULL);
+}
+
+int check_bkp_file() {
+    FILE *ativo = fopen(BKP_DB_PATH, "r+b");
+
+    if (ativo == NULL) {
+        return 0;
+    } else {
+        fclose(ativo);
+        return 1;;
+    }
+}
+
+void db_deletar_dados() {
+    char sql[100];
+
+    strcpy(sql, "delete from clientes");
+    executar_sql(sql, NULL, NULL);
+
+    strcpy(sql, "delete from reservas");
+    executar_sql(sql, NULL, NULL);
+
+    strcpy(sql, "delete from reservas_inativas");
+    executar_sql(sql, NULL, NULL);
+
+    strcpy(sql, "delete from quartos");
+    executar_sql(sql, NULL, NULL);
+
+    strcpy(sql, "delete from quartos_reservados");
+    executar_sql(sql, NULL, NULL);
+}
+
+void db_reset_db() {
+    remove(DB_PATH);
+    criar_banco_de_dados();
 }

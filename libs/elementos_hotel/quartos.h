@@ -10,6 +10,8 @@
 #include <bits/types/struct_tm.h>
 #include "../datas.h"
 
+void exibir_menu_gerenciar_quartos();
+
 int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, int tipo, int *ids);
 
 int selecionar_quarto(struct tm *data_inicio, struct tm *data_final, int *id_quarto);

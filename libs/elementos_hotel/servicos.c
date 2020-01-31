@@ -2,11 +2,10 @@
 // Created by diego on 07/01/2020.
 //
 
-#include "servicos.h"
 #include <stdio.h>
 #include "../extrafuncs.h"
 
-void exibir_menu_servicos() {
+void exibir_menu_gerenciar_servicos() {
     int opcao;
     do {
         mostrar_titulo();
