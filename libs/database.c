@@ -56,7 +56,7 @@ void criar_quartos(int n, char *sql, sqlite3 *db) {
 void gerar_dados(sqlite3 *db) {
     sqlite3_open(DB_PATH, &db);
 
-    puts("QUARTOS ...");
+    puts("REGISTRANDO QUARTOS ...");
     criar_quartos(20, "insert into quartos values (null, 1, 'Executivo triplo', 440);", db);
     criar_quartos(15, "insert into quartos values (null, 2, 'Executivo duplo', 385);", db);
     criar_quartos(5, "insert into quartos values (null, 3, 'Executivo simples', 360);", db);
@@ -65,6 +65,16 @@ void gerar_dados(sqlite3 *db) {
     criar_quartos(5, "insert into quartos values (null, 6, 'Luxo simples', 520);", db);
     criar_quartos(5, "insert into quartos values (null, 7, 'Presidencial', 1200);", db);
     puts("QUARTOS OK");
+
+    puts("REGISTRANDO SERVICOS!");
+    // servicos basicos
+    char *sql = "insert into servicos values (null, 'Babysitter hora', 45); "
+                "insert into servicos values (null, 'Diaria de automovel luxo', 100);"
+                "insert into servicos values (null, 'Diaria de automovel executivo', 60);"
+                "insert into servicos values (null, 'Tanque cheio', 300);"
+                "insert into servicos values (null, 'Carro assegurado', 250);";
+    puts("SERVICOS OK!");
+    executar_sql(sql, NULL, NULL);
 
 }
 
@@ -76,8 +86,8 @@ int criar_tabelas() {
     char *table_clientes = "create table clientes ( "
                            "id integer constraint clientes_pk primary key autoincrement, "
                            "nome text, sobrenome text, cpf text, phone text, "
-                           "id_quarto integer constraint clientes_id_quarto_fk  references reservas (id_quarto), "
-                           "id_reserva integer constraint clientes_id_reserva_fk references reservas);"
+                           "id_quarto integer default 0 constraint clientes_id_quarto_fk  references reservas (id_quarto), "
+                           "id_reserva integer default 0 constraint clientes_id_reserva_fk references reservas);"
                            "create unique index clientes_id_uindex on clientes (id);";
 
     char *table_quartos = "create table quartos ( "
@@ -86,24 +96,33 @@ int criar_tabelas() {
                           "create unique index quartos_id_uindex on quartos (id);";
 
     char *table_quartos_reservados = "create table quartos_reservados( "
-                                     "\"id\" integer constraint quartos_registrados_pk primary key autoincrement, "
-                                     "id_quarto  integer constraint quartos_registrados_id_quarto_fk references reservas (id_quarto), "
-                                     "id_reserva integer references reservas);"
-                                     "create unique index quartos_registrados_is_uindex on quartos_reservados (\"id\");";
+                                     "id integer constraint quartos_registrados_pk primary key autoincrement, "
+                                     "id_quarto  integer default 0 constraint quartos_registrados_id_quarto_fk references reservas (id_quarto), "
+                                     "id_reserva integer default 0 references reservas);"
+                                     "create unique index quartos_registrados_is_uindex on quartos_reservados (id);";
 
     char *table_reservas = "create table reservas ( "
                            "id integer constraint reservas_pk primary key autoincrement, "
                            "id_cliente integer constraint reservas_clientes_id_fk references clientes, "
                            "id_quarto integer constraint reservas_quartos_id_fk references quartos, "
                            "inicio text, fim text ); "
-                           "create unique index reservas_id_uindex on reservas (id);\n";
+                           "create unique index reservas_id_uindex on reservas (id);";
 
     char *table_reservas_inativas = "create table reservas_inativas( "
                                     "id integer constraint reservas_inativas_pk primary key autoincrement, "
                                     "id_cliente integer constraint reservas_inativas_clientes_id_fk references clientes, "
                                     "id_quarto integer constraint reservas_inativas_quartos_id_fk references quartos, "
                                     "inicio text, fim text ); "
-                                    "create unique index reservas_inativas_id_uindex on reservas_inativas (id);\n";
+                                    "create unique index reservas_inativas_id_uindex on reservas_inativas (id);";
+
+    char *tables_servicos = "create table servicos (id integer constraint servicos_pk primary key autoincrement, descricao text, valor real); "
+                            "create unique index servicos_id_uindex on servicos (id);";
+
+    char *tables_pedidos = "create table pedidos (id integer constraint pedidos_pk primary key autoincrement, id_reserva integer constraint pedidos_reservas_id_fk references reservas, data text);"
+                           "create unique index pedidos_id_uindex on pedidos (id);";
+
+    char *tables_detalhes = "create table detalhes_pedido (id integer constraint detalhes_pedido_pk primary key autoincrement, id_pedido  integer constraint detalhes_pedido_pedidos_id references pedidos, id_servico integer constraint detalhes_pedido_servicos_id references servicos, quantidade integer); "
+                            "create unique index detalhes_pedido_id_uindex on detalhes_pedido (id);";
 
     int created;
 
@@ -111,7 +130,10 @@ int criar_tabelas() {
         sqlite3_exec(db, table_quartos, NULL, NULL, &error_msg1) == SQLITE_OK &&
         sqlite3_exec(db, table_quartos_reservados, NULL, NULL, &error_msg1) == SQLITE_OK &&
         sqlite3_exec(db, table_reservas, NULL, NULL, &error_msg2) == SQLITE_OK &&
-        sqlite3_exec(db, table_reservas_inativas, NULL, NULL, &error_msg2) == SQLITE_OK) {
+        sqlite3_exec(db, table_reservas_inativas, NULL, NULL, &error_msg2) == SQLITE_OK &&
+        sqlite3_exec(db, tables_servicos, NULL, NULL, &error_msg2) == SQLITE_OK &&
+        sqlite3_exec(db, tables_pedidos, NULL, NULL, &error_msg2) == SQLITE_OK &&
+        sqlite3_exec(db, tables_detalhes, NULL, NULL, &error_msg2) == SQLITE_OK) {
         created = 1;
     } else {
         created = 0;

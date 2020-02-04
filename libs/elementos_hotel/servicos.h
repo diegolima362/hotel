@@ -6,3 +6,6 @@
 #define HOTEL_SERVICOS_H
 
 #endif //HOTEL_SERVICOS_H
+
+
+void testar_services();

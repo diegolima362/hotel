@@ -9,6 +9,7 @@
 #include "libs/database.h"
 #include "libs/elementos_hotel/reservas.h"
 #include "libs/elementos_hotel/quartos.h"
+#include "libs/elementos_hotel/servicos.h"
 
 void exibir_menu_principal();
 
@@ -23,14 +24,17 @@ int checar_diretorios();
 
 int main(int argc, char *argv[]) {
 
-    if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
-        printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
-        exit(0);
-    }
+//    if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
+//        printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
+//        exit(0);
+//    }
+//
+//    if (autenticar()) {
+//        limpar_tela();
+//        exibir_menu_principal();
+//    }
 
-    if (autenticar()) {
-        exibir_menu_principal();
-    }
+    testar_services();
 
     return 0;
 }
@@ -217,9 +221,14 @@ int checar_diretorios() {
     if (ativo == NULL) {
         mkdir("data/", 0700);
         mkdir("data/usr/", 0700);
+        mkdir("data/faturas/", 0700);
+
         ativo = fopen("data/usr/.ativo", "w+b");
+
         criacao_de_diretorios = 1;
     }
+
     fclose(ativo);
+
     return criacao_de_diretorios;
 }

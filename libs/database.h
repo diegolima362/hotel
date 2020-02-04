@@ -60,3 +60,5 @@ int check_bkp_file();
 void db_deletar_dados();
 
 void db_reset_db();
+
+int db_exibir_resultados(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
