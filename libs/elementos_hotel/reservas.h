@@ -21,6 +21,6 @@ typedef struct reserva {
     struct tm fim;
 } RESERVA;
 
-void teste_reserva();
-
 void exibir_menu_gerenciar_reservas();
+
+int selecionar_reserva();

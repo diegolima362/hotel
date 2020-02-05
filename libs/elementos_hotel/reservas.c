@@ -8,6 +8,7 @@
 #include "../database.h"
 #include "quartos.h"
 #include "../browserdb.h"
+#include "servicos.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +20,7 @@ void registrar_reserva();
 
 void exibir_menu_editar_reserva();
 
-void exibir_menu_remover_reserva();
+void exibir_menu_finalizar_reserva();
 
 int exibir_menu_buscar_reservas(char *filter, char *value);
 
@@ -29,9 +30,9 @@ void exibir_struct_reserva(RESERVA *r);
 
 void visualizar_reservas(int (*pFunction)(char *, char *));
 
-void remover_reserva_id(int id);
+void finalizar_reserva_id(int id);
 
-int selecionar_reserva(int (*pFunction)(char *, char *), RESERVA *reserva);
+int exibir_reservas(int (*pFunction)(char *, char *), RESERVA *reserva);
 
 void editar_dados_reserva(RESERVA *r);
 
@@ -53,10 +54,6 @@ void montar_reserva_busca(int id, RESERVA *reserva);
 
 int montar_reserva_sql(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
 
-
-void teste_reserva() {
-    exibir_menu_gerenciar_reservas();
-}
 
 void exibir_menu_gerenciar_reservas() {
     int opcao;
@@ -81,7 +78,7 @@ void exibir_menu_gerenciar_reservas() {
                 exibir_menu_editar_reserva();
                 break;
             case 3:
-                exibir_menu_remover_reserva();
+                exibir_menu_finalizar_reserva();
                 break;
             case 4:
                 visualizar_reservas(exibir_menu_buscar_reservas);
@@ -91,6 +88,47 @@ void exibir_menu_gerenciar_reservas() {
                 break;
             case 0:
                 return;
+            default:
+                printf("\n\nOPCAO INVALIDA!\n\n");
+                pausa();
+                break;
+        }
+    } while (opcao != 0);
+}
+
+int selecionar_reserva() {
+    int opcao;
+    int id;
+
+    do {
+        mostrar_titulo();
+        printf("\n\n\t\tSELECIONAR RESERVA\n\n");
+        printf("\t\t(1) BUSCAR RESERVA\n\n");
+        printf("\t\t (2) LISTAR RESERVA\n\n");
+        printf("\t\t  (3) INSERIR ID DA RESERVA\n\n");
+        printf("\n\t\t(0) VOLTAR\n");
+        printf("\n\t\tOPÇÃO: ");
+        scanf(" %d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                id = exibir_reservas(exibir_menu_buscar_reservas, NULL);
+                return id;
+            case 2:
+                id = exibir_reservas(exibir_menu_listar_reservas, NULL);
+                return id;
+            case 3:
+                printf("\n\n\t\tID: ");
+                scanf(" %d", &id);
+                if (testar_id(id, "reservas"))
+                    return id;
+                else {
+                    printf("\n\t\tID INVALIDO\n");
+                    pausa();
+                }
+                break;
+            case 0:
+                return 0;
             default:
                 printf("\n\nOPCAO INVALIDA!\n\n");
                 pausa();
@@ -139,10 +177,8 @@ void registrar_reserva() {
 
         if (op == 1) {
             executar_sql(sql, NULL, NULL);
-            reservar_quarto(r
-                                    .id_quarto, r.id);
-            alocar_cliente_reserva(r
-                                           .id_cliente, r.id, r.id_quarto);
+            reservar_quarto(r.id_quarto, r.id);
+            alocar_cliente_reserva(r.id_cliente, r.id, r.id_quarto);
             return;
         } else if (op == 2) {
             editar_dados_reserva(&r);
@@ -190,11 +226,11 @@ void exibir_menu_editar_reserva() {
 
         switch (opcao) {
             case 1:
-                id = selecionar_reserva(exibir_menu_buscar_reservas, &r);
+                id = exibir_reservas(exibir_menu_buscar_reservas, &r);
                 editar_dados_reserva(&r);
                 break;
             case 2:
-                id = selecionar_reserva(exibir_menu_listar_reservas, &r);
+                id = exibir_reservas(exibir_menu_listar_reservas, &r);
                 editar_dados_reserva(&r);
                 break;
             case 3:
@@ -217,46 +253,31 @@ void exibir_menu_editar_reserva() {
     } while (opcao != 0);
 }
 
-void exibir_menu_remover_reserva() {
-    int opcao;
+void exibir_menu_finalizar_reserva() {
+    int op;
     int id;
-    do {
-        mostrar_titulo();
-        printf("\n\n\t\tREMOVER RESERVA\n\n");
-        printf("\t\t(1) BUSCAR RESERVA PARA REMOCAO\n\n");
-        printf("\t\t (2) LISTAR RESERVA PARA REMOCAO\n\n");
-        printf("\t\t  (3) INSERIR ID DA RESERVA\n\n");
-        printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
-        scanf(" %d", &opcao);
+    while (1) {
+        id = selecionar_reserva();
+        if (id != 0) {
+            printf("\n\t\t(1) CONFIRMAR (0) CANCELAR : ");
+            scanf(" %d", &op);
 
-        switch (opcao) {
-            case 1:
-                id = selecionar_reserva(exibir_menu_buscar_reservas, NULL);
-                remover_reserva_id(id);
-                break;
-            case 2:
-                id = selecionar_reserva(exibir_menu_listar_reservas, NULL);
-                remover_reserva_id(id);
-                break;
-            case 3:
-                printf("\n\n\t\tID: ");
-                scanf(" %d", &id);
-                if (testar_id(id, "reserva"))
-                    remover_reserva_id(id);
-                else {
-                    printf("\n\t\tID INVALIDO\n");
-                    pausa();
-                }
-                break;
-            case 0:
-                return;
-            default:
-                printf("\n\nOPCAO INVALIDA!\n\n");
+            if (op == 1) {
+                finalizar_reserva_id(id);
+
+                mostrar_titulo();
+                printf("\n\n\t\tRESERVA FINALIZADA!\n\n");
                 pausa();
-                break;
-        }
-    } while (opcao != 0);
+
+            } else if (op == 0) {
+                printf("\n\t\tCANCELADO!\n");
+                pausa();
+                return;
+            }
+
+        } else return;
+
+    }
 }
 
 int exibir_menu_buscar_reservas(char *filter, char *value) {
@@ -364,7 +385,7 @@ void visualizar_reservas(int (*pFunction)(char *, char *)) {
     int id;
 
     while (1) {
-        id = selecionar_reserva(pFunction, &r);
+        id = exibir_reservas(pFunction, &r);
 
         if (id == 0)
             break;
@@ -375,24 +396,36 @@ void visualizar_reservas(int (*pFunction)(char *, char *)) {
         if (op == 1)
             editar_dados_reserva(&r);
         else if (op == 2)
-            remover_reserva_id(id);
+            finalizar_reserva_id(id);
         else if (op == 3)
             continue;
         else break;
     }
 }
 
-void remover_reserva_id(int id) {
+void finalizar_reserva_id(int id) {
     char id_char[5];
     snprintf(id_char, 5, "%d", id);
-    db_remover_reserva(id_char);
+
+    char aux[10];
+    char nome_fatura[100];
+    snprintf(aux, 10, "%d", id);
+    strcpy(nome_fatura, "data/faturas/fatura_id_reserva_");
+    strcat(nome_fatura, aux);
+    strcat(nome_fatura, ".txt");
 
     mostrar_titulo();
-    printf("\n\n\t\t\tRESERVA REMOVIDA\n");
+    printf("\n\n\t\t\tRESERVA FINALIZADA\n");
+    printf("\n\n\t\tFATURA SALVA EM %s\n\n", nome_fatura);
+    pausa();
+
+    gerar_fatura_reserva_finalizada(id);
+    db_remover_reserva(id_char);
+
     pausa();
 }
 
-int selecionar_reserva(int (*pFunction)(char *, char *), RESERVA *reserva) {
+int exibir_reservas(int (*pFunction)(char *, char *), RESERVA *reserva) {
     char column[50];
     char filter[50];
     int ids_encontrados[LIMIT_BUSCA] = {0};
@@ -433,7 +466,7 @@ int selecionar_reserva(int (*pFunction)(char *, char *), RESERVA *reserva) {
                     printf("\n\n\t\t(1) CONFIRMAR RESERVA (0) VOLTAR :  ");
                     scanf(" %d", &confirm);
 
-                    return confirm == 1 ? id : selecionar_reserva(pFunction, NULL);
+                    return confirm == 1 ? id : exibir_reservas(pFunction, NULL);
 
                 } else {
                     printf("\n\t\tID NAO LISTADO\n");

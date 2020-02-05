@@ -23,6 +23,8 @@ void formatar_quartos_disponiveis(char *sql, char *tipo, char *inicio, char *fim
 
 void listar_quartos();
 
+void editar_preco_quarto();
+
 void exibir_menu_gerenciar_quartos() {
     int opcao;
 
@@ -46,6 +48,7 @@ void exibir_menu_gerenciar_quartos() {
                 pausa();
                 break;
             case 3:
+                editar_preco_quarto();
                 break;
             case 4:
                 limpar_tela();
@@ -58,6 +61,34 @@ void exibir_menu_gerenciar_quartos() {
                 break;
         }
     } while (opcao != 0);
+}
+
+void editar_preco_quarto() {
+    int tipo;
+    float valor;
+    char aux[10];
+    char sql[SQL_SIZE];
+
+    tipo = selecionar_tipo_quarto();
+
+    mostrar_titulo();
+    printf("\n\t\tINSIRA O NOVO VALOR: ");
+    scanf(" %f", &valor);
+
+    strcpy(sql, "update quartos set valor = ");
+    snprintf(aux, 10, "%.2f", valor);
+    strcat(sql, aux);
+    strcat(sql, " where tipo = ");
+    snprintf(aux, 10, "%d", tipo);
+    strcat(sql, aux);
+    strcat(sql, ";");
+
+    executar_sql(sql, NULL, NULL);
+
+    mostrar_titulo();
+    printf("\n\n\t\tCONCLUIDO!\n");
+    pausa();
+
 }
 
 void listar_quartos() {
@@ -194,13 +225,13 @@ int selecionar_tipo_quarto() {
     do {
         mostrar_titulo();
         printf("\n\t\tSELECIONAR QUARTO\n");
-        printf("\n\t\t(7) PRESIDENCIAL\n");
-        printf("\n\t\t (6) LUXO SIMPLES");
-        printf("\n\t\t  (5) LUXO DUPLO");
-        printf("\n\t\t   (4) LUXO TRIPLO\n");
-        printf("\n\t\t  (3) EXECUTIVO SIMPLES");
-        printf("\n\t\t (2) EXECUTIVO DUPLO");
         printf("\n\t\t(1) EXECUTIVO TRIPLO\n");
+        printf("\n\t\t (2) EXECUTIVO DUPLO");
+        printf("\n\t\t  (3) EXECUTIVO SIMPLES");
+        printf("\n\t\t   (4) LUXO TRIPLO\n");
+        printf("\n\t\t    (5) LUXO DUPLO");
+        printf("\n\t\t     (6) LUXO SIMPLES");
+        printf("\n\t\t      (7) PRESIDENCIAL\n");
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPÇÃO: ");
         limpar_teclado();

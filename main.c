@@ -13,8 +13,6 @@
 
 void exibir_menu_principal();
 
-void exibir_menu_gerenciar_servicos();
-
 void exibir_menu_configuracoes();
 
 void exibir_menu_gerenciar_dados_sistema();
@@ -24,23 +22,20 @@ int checar_diretorios();
 
 int main(int argc, char *argv[]) {
 
-//    if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
-//        printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
-//        exit(0);
-//    }
-//
-//    if (autenticar()) {
-//        limpar_tela();
-//        exibir_menu_principal();
-//    }
+    if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
+        printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
+        exit(0);
+    }
 
-    testar_services();
+    if (autenticar()) {
+        limpar_tela();
+        exibir_menu_principal();
+    }
 
     return 0;
 }
 
 void exibir_menu_principal() {
-
     int opcao;
 
     do {

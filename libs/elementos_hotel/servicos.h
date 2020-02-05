@@ -8,4 +8,6 @@
 #endif //HOTEL_SERVICOS_H
 
 
-void testar_services();
+void gerar_fatura_reserva_finalizada(int reserva);
+
+void exibir_menu_gerenciar_servicos();

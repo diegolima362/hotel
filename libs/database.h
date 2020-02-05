@@ -12,13 +12,6 @@
 #define DB_PATH "data/hotel.db"
 #define BKP_DB_PATH "data/hotel_bkp.db"
 
-typedef struct quarto {
-    int id;
-    int tipo;
-    char descricao[18];
-    float valor;
-} QUARTO;
-
 int criar_banco_de_dados();
 
 int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void *ptr);

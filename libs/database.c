@@ -348,7 +348,12 @@ int db_remover_reserva(char *id) {
     strcat(sql, " ;");
     executar_sql(sql, NULL, NULL);
 
-    strcpy(sql, "delete from quarto_registrados where id_reserva = ");
+    strcpy(sql, "delete from quartos_reservados where id_reserva = ");
+    strcat(sql, id);
+    strcat(sql, " ;");
+    executar_sql(sql, NULL, NULL);
+
+    strcpy(sql, "update clientes set id_reserva = 0, id_quarto = 0 where id_reserva = ");
     strcat(sql, id);
     strcat(sql, " ;");
     executar_sql(sql, NULL, NULL);
