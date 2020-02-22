@@ -26,10 +26,4 @@ void alterar_login();
 
 void tela_pegar_login(LOGIN *login);
 
-int existe_usuario_cadastrado();
-
 int validar_login(LOGIN *login_comparacao);
-
-void pegar_dados_arquivo_login(LOGIN *login);
-
-int gravar_dados_arquivo_login(LOGIN *login);

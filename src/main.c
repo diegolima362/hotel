@@ -2,14 +2,15 @@
 #include <io.h>
 #define PATH_ATIVO "data\\usr\\.ativowin"
 #else
+
 #include <sys/stat.h>
+
 #define PATH_ATIVO "data/usr/.ativounix"
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 #include "libs/extrafuncs.h"
 #include "libs/login.h"
 #include "libs/datas.h"
@@ -31,13 +32,17 @@ int checar_diretorios();
 int main(int argc, char *argv[]) {
 
     if (checar_diretorios() == 1 && criar_banco_de_dados() == 1) {
+        mostrar_titulo();
         printf("\n\n\t\tBASE DE DADOS CRIADA ...\n\t\tEXECUTE O PROGRAMA NOVAMENTE\n\n");
         exit(0);
     }
 
     if (autenticar()) {
-        limpar_tela();
         exibir_menu_principal();
+    } else {
+        mostrar_titulo();
+        printf("\n\t\tLOGIN INVALIDO! FINALIZANDO ...\n");
+        pausa();
     }
 
     return 0;

@@ -4,6 +4,7 @@
 
 #include "login.h"
 #include "extrafuncs.h"
+#include "database.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,11 +12,11 @@
 
 int autenticar() {
     LOGIN *login = (LOGIN *) calloc(1, sizeof(LOGIN *));
-
+    limpar_tela();
     if (existe_usuario_cadastrado() == 0) {
         criar_login(login);
     }
-    limpar_tela();
+
     printf("\n\t\tINSIRA O LOGIN E SENHA\n\n");
     tela_pegar_login(login);
 
@@ -37,7 +38,7 @@ int criar_login(LOGIN *login) {
     remover_quebra(senha_confirmacao);
 
     if (strcmp(login->pwd, senha_confirmacao) == 0) {
-        if (gravar_dados_arquivo_login(login)) {
+        if (db_gravar_login(login->usr, login->pwd)) {
             return 1;
         } else {
             return 0;
@@ -50,10 +51,36 @@ int criar_login(LOGIN *login) {
 }
 
 void alterar_login() {
-    LOGIN *login = (LOGIN *) calloc(1, sizeof(LOGIN *));
-    if (criar_login(login)) {
+    LOGIN login;
 
+    mostrar_titulo();
+    printf("\n\t\tLOGIN ATUAL\n");
+    tela_pegar_login(&login);
+
+    if (validar_login(&login) == 0) {
+        printf("\n\n\t\tLOGIN INCORRETO!\n");
+        pausa();
+        return;
     }
+
+    mostrar_titulo();
+    printf("\n\t\tNOVO LOGIN\n");
+    tela_pegar_login(&login);
+    printf("\n\t\t(1) CONFIRMAR (0) CANCELAR : ");
+    int op;
+    scanf(" %d", &op);
+    if (op == 1) {
+        db_alterar_dados_login(login.usr, login.pwd);
+        mostrar_titulo();
+        printf("\n\t\tLOGIN ALTERADO!\n");
+        pausa();
+        return;
+    } else {
+        printf("\n\n\t\t\tCANCELADO!\n");
+        pausa();
+        return;
+    }
+
 }
 
 void tela_pegar_login(LOGIN *login) {
@@ -67,47 +94,16 @@ void tela_pegar_login(LOGIN *login) {
     remover_quebra(login->pwd);
 }
 
-int existe_usuario_cadastrado() {
-    FILE *test = fopen(PATH_USER_FILE, "r+b");
-
-    if (test) {
-        fclose(test);
-        return 1;
-    }
-
-    return 0;
-}
 
 int validar_login(LOGIN *login_comparacao) {
-    LOGIN *login_certo = (LOGIN *) calloc(1, sizeof(LOGIN *));
-    pegar_dados_arquivo_login(login_certo);
+    LOGIN login_certo;
 
-    int user_certo = strcmp(login_certo->usr, login_comparacao->usr);
-    int senha_certa = strcmp(login_certo->pwd, login_comparacao->pwd);
+    db_montar_dados_login(login_certo.usr, login_certo.pwd);
 
-    free(login_certo);
+    int user_certo = strcmp(login_certo.usr, login_comparacao->usr);
+    int senha_certa = strcmp(login_certo.pwd, login_comparacao->pwd);
 
     if (user_certo == 0 && senha_certa == 0)
-        return 1;
-    else
-        return 0;
-}
-
-void pegar_dados_arquivo_login(LOGIN *login) {
-    FILE *arquivo_login;
-    arquivo_login = fopen(PATH_USER_FILE, "r+b");
-    fread(login, sizeof(LOGIN), 1, arquivo_login);
-    fclose(arquivo_login);
-}
-
-int gravar_dados_arquivo_login(LOGIN *login) {
-    FILE *arquivo_login = fopen(PATH_USER_FILE, "w+b");
-
-    int login_gravado = (int) fwrite(login, sizeof(LOGIN), 1, arquivo_login);
-
-    fclose(arquivo_login);
-
-    if (login_gravado)
         return 1;
     else
         return 0;

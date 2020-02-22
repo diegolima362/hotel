@@ -41,5 +41,11 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="hotel.db" uuid="f175fc1d-7b1b-4dc0-ba49-6d7ed8d01db4">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/src/cmake-build-debug/data/hotel.db</jdbc-url>
+    </data-source>
   </component>
 </project>

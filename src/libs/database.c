@@ -14,6 +14,8 @@
  */
 int loadOrSaveDb(sqlite3 *pInMemory, const char *zFilename, int isSave);
 
+int extrair_login(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
+
 int criar_banco_de_dados() {
     FILE *db = fopen(DB_PATH, "r+b");
     int criacao__banco_dados = 0;
@@ -124,6 +126,10 @@ int criar_tabelas() {
     char *tables_detalhes = "create table detalhes_pedido (id integer constraint detalhes_pedido_pk primary key autoincrement, id_pedido  integer constraint detalhes_pedido_pedidos_id references pedidos, id_servico integer constraint detalhes_pedido_servicos_id references servicos, quantidade integer); "
                             "create unique index detalhes_pedido_id_uindex on detalhes_pedido (id);";
 
+    char *tables_logins = "create table logins(id integer not null constraint logins_pk primary key autoincrement, login varchar(20) not null, senha varchar(20) not null); "
+                          "create unique index logins_id_uindex on logins (id); "
+                          "create unique index logins_login_uindex on logins (login);";
+
     int created;
 
     if (sqlite3_exec(db, table_clientes, NULL, NULL, &error_msg) == SQLITE_OK &&
@@ -133,12 +139,12 @@ int criar_tabelas() {
         sqlite3_exec(db, table_reservas_inativas, NULL, NULL, &error_msg2) == SQLITE_OK &&
         sqlite3_exec(db, tables_servicos, NULL, NULL, &error_msg2) == SQLITE_OK &&
         sqlite3_exec(db, tables_pedidos, NULL, NULL, &error_msg2) == SQLITE_OK &&
-        sqlite3_exec(db, tables_detalhes, NULL, NULL, &error_msg2) == SQLITE_OK) {
+        sqlite3_exec(db, tables_detalhes, NULL, NULL, &error_msg2) == SQLITE_OK &&
+        sqlite3_exec(db, tables_logins, NULL, NULL, &error_msg2) == SQLITE_OK) {
         created = 1;
     } else {
         created = 0;
     }
-
 
     sqlite3_close(db);
 
@@ -289,13 +295,9 @@ int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2) {
 
 int get_qtd_clientes() {
     int total;
-    char *sql = (char *) malloc(sizeof(char) * 150);
-
+    char sql[100];
     strcpy(sql, "select count(id) from clientes;");
-
     executar_sql(sql, montar_qtd, &total);
-    free(sql);
-
     return total;
 }
 
@@ -542,3 +544,57 @@ void db_reset_db() {
     remove(DB_PATH);
     criar_banco_de_dados();
 }
+
+int db_gravar_login(char *login, char *senha) {
+    char sql[200];
+    strcpy(sql, "insert into logins (login, senha) values ('");
+    strcat(sql, login);
+    strcat(sql, "','");
+    strcat(sql, senha);
+    strcat(sql, "');");
+
+    executar_sql(sql, NULL, NULL);
+    return 1;
+}
+
+int db_montar_dados_login(char *login, char *senha) {
+    char dado[50];
+    char sql[50];
+
+    strcpy(sql, "select login, senha from logins");
+    executar_sql(sql, extrair_login, dado);
+
+    char *pt = strtok(dado, ",");
+    strcpy(login, pt);
+    pt = strtok(NULL, "\n\t\t");
+    strcpy(senha, pt);
+
+    return 0;
+}
+
+int db_alterar_dados_login(char *login, char *senha) {
+    char sql[200];
+    strcpy(sql, "update logins set login = '");
+    strcat(sql, login);
+    strcat(sql, "', senha = '");
+    strcat(sql, senha);
+    strcat(sql, "' where id = 1;");
+    executar_sql(sql, NULL, NULL);
+    return 0;
+}
+
+int extrair_login(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna) {
+    strcpy(ptr, valor_na_coluna[0]);
+    strcat(ptr, ",");
+    strcat(ptr, valor_na_coluna[1]);
+    return 0;
+}
+
+int existe_usuario_cadastrado() {
+    char sql[50];
+    int qtd;
+    strcpy(sql, "select count(*) from logins;");
+    executar_sql(sql, montar_qtd, &qtd);
+    return qtd;
+}
+

@@ -60,3 +60,11 @@ void db_deletar_dados();
 void db_reset_db();
 
 int db_exibir_resultados(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
+
+int db_gravar_login(char *login, char *senha);
+
+int db_montar_dados_login(char *login, char *senha);
+
+int db_alterar_dados_login(char *login, char *senha);
+
+int existe_usuario_cadastrado();
