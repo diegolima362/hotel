@@ -7,8 +7,11 @@
 
 #endif //HOTEL_LOGIN_H
 
-#define PATH_LOGIN "data/usr/"
-#define PATH_USER_FILE "data/usr/data.pwd"
+#if defined(_WIN32)
+#define PATH_USER_FILE "data\\usr\\datawin.pwd"
+#else
+#define PATH_USER_FILE "data/usr/dataunix.pwd"
+#endif
 
 typedef struct {
     char usr[21];

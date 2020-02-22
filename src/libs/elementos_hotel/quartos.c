@@ -5,7 +5,7 @@
 #include "quartos.h"
 #include "../datas.h"
 
-#include <bits/types/struct_tm.h>
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
 

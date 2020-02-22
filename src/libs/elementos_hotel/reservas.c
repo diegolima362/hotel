@@ -409,8 +409,11 @@ void finalizar_reserva_id(int id) {
 
     char aux[10];
     char nome_fatura[100];
+
     snprintf(aux, 10, "%d", id);
-    strcpy(nome_fatura, "data/faturas/fatura_id_reserva_");
+
+    strcpy(nome_fatura, PATH_FATURA);
+    strcat(nome_fatura, "fatura_id_reserva_");
     strcat(nome_fatura, aux);
     strcat(nome_fatura, ".txt");
 

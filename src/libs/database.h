@@ -7,10 +7,15 @@
 
 #endif //HOTEL_DATABASE_H
 
-#include <time.h>
-
+#if defined(_WIN32)
+#define DB_PATH "data\\hotel.db"
+#define BKP_DB_PATH "data\\hotel_bkp.db"
+#else
 #define DB_PATH "data/hotel.db"
 #define BKP_DB_PATH "data/hotel_bkp.db"
+#endif
+
+#include <time.h>
 
 int criar_banco_de_dados();
 

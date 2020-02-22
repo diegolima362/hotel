@@ -1,3 +1,11 @@
+#if defined(_WIN32)
+#include <io.h>
+#define PATH_ATIVO "data\\usr\\.ativowin"
+#else
+#include <sys/stat.h>
+#define PATH_ATIVO "data/usr/.ativounix"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -210,18 +218,26 @@ void exibir_menu_gerenciar_dados_sistema() {
 }
 
 int checar_diretorios() {
-    FILE *ativo = fopen("data/usr/.ativo", "r+b");
+    FILE *ativo = fopen(PATH_ATIVO, "r+b");
     int criacao_de_diretorios = 0;
 
     if (ativo == NULL) {
+
+#if defined(_WIN32)
+        _mkdir("data\\");
+        _mkdir("data\\usr\\");
+        _mkdir("data\\faturas\\");
+#else
         mkdir("data/", 0700);
         mkdir("data/usr/", 0700);
         mkdir("data/faturas/", 0700);
+#endif
 
-        ativo = fopen("data/usr/.ativo", "w+b");
+        ativo = fopen(PATH_ATIVO, "w+b");
 
         criacao_de_diretorios = 1;
     }
+
 
     fclose(ativo);
 

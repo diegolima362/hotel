@@ -76,7 +76,8 @@ void gerar_fatura_reserva_finalizada(int reserva) {
     char aux[10];
 
     snprintf(aux, 10, "%d", reserva);
-    strcpy(nome_fatura, "data/faturas/fatura_id_reserva_");
+    strcpy(nome_fatura, PATH_FATURA);
+    strcat(nome_fatura, "fatura_id_reserva_");
     strcat(nome_fatura, aux);
     strcat(nome_fatura, ".txt");
 

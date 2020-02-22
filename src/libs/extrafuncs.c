@@ -34,7 +34,11 @@ void limpar_teclado() {
 }
 
 void limpar_tela() {
+#if defined(_WIN32)
+    system("cls");
+#else
     system("clear");
+#endif
 }
 
 int is_in(int valor, const int *array, int tamanho) {

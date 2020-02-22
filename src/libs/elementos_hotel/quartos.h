@@ -7,7 +7,7 @@
 
 #endif //HOTEL_QUARTOS_H
 
-#include <bits/types/struct_tm.h>
+#include <time.h>
 #include "../datas.h"
 
 void exibir_menu_gerenciar_quartos();
