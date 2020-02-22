@@ -135,7 +135,7 @@ void exibir_menu_gerenciar_servicos() {
         printf("\n\t\t   (4) LISTAR SERVICOS\n");
         printf("\n\t\t    (5) REMOVER SERVICO\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {

@@ -48,7 +48,7 @@ void exibir_menu_principal() {
         printf("\n\t\t    (5) GERENCIAR DADOS DO SISTEMA\n");
         printf("\n\t\t     (6) MANUTENCAO\n");
         printf("\n\t\t(0) SAIR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         limpar_teclado();
         scanf(" %d", &opcao);
 
@@ -97,7 +97,7 @@ void exibir_menu_configuracoes() {
         printf("\t\t    (5) REMOVER BACKUP\n\n");
         printf("\t\t     (6) REINICIAR BANCO DE DADOS\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
 
         limpar_teclado();
         scanf(" %d", &opcao);
@@ -180,7 +180,7 @@ void exibir_menu_gerenciar_dados_sistema() {
         printf("\t\t (2) HISTORICO DE HOSPEDES\n\n");
         printf("\t\t  (3) LISTAR QUARTOS RESERVADOS\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {

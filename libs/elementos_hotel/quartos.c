@@ -35,7 +35,7 @@ void exibir_menu_gerenciar_quartos() {
         printf("\t\t (2) LISTAR QUARTOS\n\n");
         printf("\t\t  (3) EDITAR PRECO DOS QUARTOS\n\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
@@ -233,7 +233,7 @@ int selecionar_tipo_quarto() {
         printf("\n\t\t     (6) LUXO SIMPLES");
         printf("\n\t\t      (7) PRESIDENCIAL\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         limpar_teclado();
         scanf(" %d", &tipo);
 

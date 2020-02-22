@@ -67,7 +67,7 @@ void exibir_menu_gerenciar_reservas() {
         printf("\t\t   (4) BUSCAR RESERVAS\n\n");
         printf("\t\t    (5) LISTAR RESERVAS\n\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
@@ -107,7 +107,7 @@ int selecionar_reserva() {
         printf("\t\t (2) LISTAR RESERVA\n\n");
         printf("\t\t  (3) INSERIR ID DA RESERVA\n\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
@@ -221,7 +221,7 @@ void exibir_menu_editar_reserva() {
         printf("\t\t (2) LISTAR RESERVAS\n");
         printf("\t\t  (3) INSERIR ID DA RESERVA\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
@@ -294,7 +294,7 @@ int exibir_menu_buscar_reservas(char *filter, char *value) {
         printf("\t\t  (3) BUSCAR POR QUARTO\n\n");
         printf("\t\t   (4) BUSCAR POR CLIENTE\n\n");
         printf("\n\t\t(0) VOLTAR\n\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
@@ -350,7 +350,7 @@ int exibir_menu_listar_reservas(char *column, char *filter) {
         printf("\n\t\t(1) LISTAR RESERVAS ATIVAS\n");
         printf("\n\t\t (2) LISTAR RESERVAS FINALIZADAS\n\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {

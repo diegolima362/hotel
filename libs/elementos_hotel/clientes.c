@@ -53,7 +53,7 @@ void exibir_menu_gerenciar_clientes() {
         printf("\t\t   (4) BUSCAR CLIENTE REGISTRADO\n\n");
         printf("\t\t    (5) LISTAR CLIENTES\n\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
@@ -109,7 +109,7 @@ void exibir_menu_editar_cliente() {
         printf("\t\t (2) LISTAR CLIENTES\n");
         printf("\t\t  (3) INSERIR ID DO CLIENTES\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
@@ -151,7 +151,7 @@ void exibir_menu_remover_cliente() {
         printf("\t\t (2) LISTAR CLIENTES PARA REMOCAO\n");
         printf("\t\t  (3) INSERIR ID DO CLIENTE\n\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
@@ -194,7 +194,7 @@ int exibir_menu_buscar_clientes(char *filter, char *value) {
         printf("\t\t  (2) BUSCAR POR CPF\n\n");
         printf("\t\t    (3) BUSCAR POR ID\n\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
@@ -240,7 +240,7 @@ int exibir_menu_listar_clientes(char *column, char *filter) {
         printf("\n\t\t (2) LISTAR CLIENTES COM RESERVA ATIVA\n");
         printf("\n\t\t  (3) LISTAR CLIENTES SEM RESERVA ATIVA\n\n");
         printf("\n\t\t(0) VOLTAR\n");
-        printf("\n\t\tOPÇÃO: ");
+        printf("\n\t\tOPCAO: ");
         scanf(" %d", &opcao);
 
         switch (opcao) {
