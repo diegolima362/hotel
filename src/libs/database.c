@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <sqlite3.h>
+#include "db/sqlite3.h"
 
 /*
  * author: https://www.sqlite.org/backup.html
