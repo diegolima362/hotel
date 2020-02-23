@@ -41,6 +41,8 @@ void remover_servico_id(int id);
 
 void editar_servico(int id, char *column, char *valor);
 
+int checar_servicos_contrados(int reserva);
+
 int mostrar_fatura(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna) {
 
     for (int i = 0; i < qtd_colunas; i++) {
@@ -76,7 +78,7 @@ void gerar_fatura_reserva_finalizada(int reserva) {
     char aux[10];
 
     snprintf(aux, 10, "%d", reserva);
-    strcpy(nome_fatura, PATH_FATURA);
+    strcpy(nome_fatura, "data/faturas/");
     strcat(nome_fatura, "fatura_id_reserva_");
     strcat(nome_fatura, aux);
     strcat(nome_fatura, ".txt");
@@ -103,26 +105,50 @@ void gerar_extrato(FILE *file, int id_reserva) {
                 "from clientes c join reservas r on c.id_reserva = r.id where r.id = ");
     strcat(sql, aux);
     strcat(sql, " ;");
-
     executar_sql(sql, mostrar_fatura, file);
+    int qtd = checar_servicos_contrados(id_reserva);
+    if (qtd > 0) {
+        strcpy(sql,
+               "select p.id as 'id pedido: ', s.descricao || ' *' || d.quantidade as 'servico: ', s.valor as 'valor: ', p.data as 'data: ', ' ' as '-----------------------------------'"
+               "from servicos s join detalhes_pedido d on d.id_servico = s.id join pedidos p on d.id_pedido = p.id "
+               "join reservas r on p.id_reserva = r.id where r.id = ");
+        strcat(sql, aux);
+        strcat(sql, " ;");
+        executar_sql(sql, mostrar_fatura, file);
 
-    strcpy(sql,
-           "select p.id as 'id pedido: ', s.descricao || ' *' || d.quantidade as 'servico: ', s.valor as 'valor: ', p.data as 'data: ', ' ' as '-----------------------------------'"
-           "from servicos s join detalhes_pedido d on d.id_servico = s.id join pedidos p on d.id_pedido = p.id "
-           "join reservas r on p.id_reserva = r.id where r.id = ");
+        strcpy(sql,
+               "select tota_dias as '\n\t\tdiarias: ', valor as 'valor da diaria: ', (tota_dias * valor) as 'total da reserva: ', sum(subtotal) as '\n\t\tvalor dos servicos contratados: ', "
+               "sum(subtotal + (tota_dias * valor)) || '\n' as '\n\t\t-------------------------------------------\n\n\t\ttotal da fatura: ' from (select s.valor * d.quantidade as subtotal, r.fim, r.inicio, q.valor, julianday(fim) - julianday(inicio) as tota_dias "
+               "from servicos s join detalhes_pedido d on d.id_servico = s.id join pedidos p on d.id_pedido = p.id join reservas r on p.id_reserva = r.id join quartos q on r.id_quarto = q.id where r.id = ");
+        strcat(sql, aux);
+        strcat(sql, " );");
+        executar_sql(sql, mostrar_fatura, file);
+    } else {
+        strcpy(sql,
+               "select tota_dias as '\n\t\tdiarias: ', valor as 'valor da diaria: ', (tota_dias * valor) as 'total da reserva: ', "
+               "sum(tota_dias * valor) || '\n' as '\n\t\t-------------------------------------------\n\n\t\ttotal da fatura: ' from (select r.fim, r.inicio, q.valor, julianday(fim) - julianday(inicio) as tota_dias "
+               "from reservas r join quartos q on r.id_quarto = q.id where r.id = ");
+        strcat(sql, aux);
+        strcat(sql, " );");
+        executar_sql(sql, mostrar_fatura, file);
+    }
+}
+
+int checar_servicos_contrados(int reserva) {
+    char sql[200];
+    char aux[10];
+    int qtd;
+
+    snprintf(aux, 10, "%d", reserva);
+    strcpy(sql, "select count(*) from servicos s join "
+                "detalhes_pedido d on d.id_servico = s.id "
+                "join pedidos p on d.id_pedido = p.id "
+                "join reservas r on p.id_reserva = r.id where r.id = ");
     strcat(sql, aux);
-    strcat(sql, " ;");
+    strcat(sql, ";");
 
-    executar_sql(sql, mostrar_fatura, file);
-
-    strcpy(sql,
-           "select tota_dias as '\n\t\tdiarias: ', valor as 'valor da diaria: ', (tota_dias * valor) as 'total da reserva: ', sum(subtotal) as '\n\t\tvalor dos servicos contratados: ', "
-           "sum(subtotal + (tota_dias * valor)) || '\n' as '\n\t\t-------------------------------------------\n\n\t\ttotal da fatura: ' from (select s.valor * d.quantidade as subtotal, r.fim, r.inicio, q.valor, julianday(fim) - julianday(inicio) as tota_dias "
-           "from servicos s join detalhes_pedido d on d.id_servico = s.id join pedidos p on d.id_pedido = p.id join reservas r on p.id_reserva = r.id join quartos q on r.id_quarto = q.id where r.id = ");
-    strcat(sql, aux);
-    strcat(sql, " );");
-
-    executar_sql(sql, mostrar_fatura, file);
+    executar_sql(sql, montar_qtd, &qtd);
+    return qtd;
 }
 
 void exibir_menu_gerenciar_servicos() {
