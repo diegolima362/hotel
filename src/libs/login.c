@@ -11,17 +11,17 @@
 #include <string.h>
 
 int autenticar() {
-    LOGIN *login = (LOGIN *) calloc(1, sizeof(LOGIN *));
+    LOGIN login;
     limpar_tela();
     if (existe_usuario_cadastrado() == 0) {
-        criar_login(login);
+        criar_login(&login);
     }
-
+    
+    limpar_tela();
     printf("\n\t\tINSIRA O LOGIN E SENHA\n\n");
-    tela_pegar_login(login);
+    tela_pegar_login(&login);
 
-    int status = validar_login(login);
-    free(login);
+    int status = validar_login(&login);
 
     return status;
 }
