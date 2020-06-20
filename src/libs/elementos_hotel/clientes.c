@@ -86,15 +86,26 @@ int registrar_cliente() {
     char sql[300];
     CLIENTE c;
 
-    gerar_id("clientes", &c.id);
+    c.id = 0;
     c.id_reserva = 0;
     c.id_quarto = 0;
 
+    gerar_id("clientes", &c.id);
+
     pegar_dados_cliente(&c);
     formatar_insert_cliente(&c, sql);
-    executar_sql(sql, NULL, NULL);
 
-    return c.id;
+    mostrar_titulo();
+    if (executar_sql(sql, NULL, NULL) == -1) {
+        printf("\n\t\tERRO AO REGISTRAR CLIENTE!\n");
+        pausa();
+        return 0;
+    }
+    else {
+        printf("\n\t\tCLIENTE REGISTRADO COM SUCESSO!\n");
+        pausa();
+        return c.id;
+    }
 }
 
 void exibir_menu_editar_cliente() {

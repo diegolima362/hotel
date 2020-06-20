@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include "db/sqlite3.h"
 
+#define SQL_SIZE 512
+
 /*
  * author: https://www.sqlite.org/backup.html
  */
@@ -42,8 +44,14 @@ int executar_sql(char *sql, int (*callback)(void *, int, char **, char **), void
 
     sqlite3_open(DB_PATH, &db);
     sqlite3_exec(db, sql, callback, ptr, &error_msg);
-    if (error_msg != NULL)
+    if (error_msg != NULL) {
+        mostrar_titulo();
+        puts(sql);
         puts(error_msg);
+        pausa();
+        sqlite3_close(db);
+        return -1;
+    }
     sqlite3_close(db);
 
     return ptr != NULL ? ((int *) ptr)[0] : 0;
@@ -56,9 +64,9 @@ void criar_quartos(int n, char *sql, sqlite3 *db) {
 }
 
 void gerar_dados(sqlite3 *db) {
-    sqlite3_open(DB_PATH, &db);
+    char *error_msg;
 
-    puts("REGISTRANDO QUARTOS ...");
+    puts("\n\t\tREGISTRANDO QUARTOS ...");
     criar_quartos(20, "insert into quartos values (null, 1, 'Executivo triplo', 440);", db);
     criar_quartos(15, "insert into quartos values (null, 2, 'Executivo duplo', 385);", db);
     criar_quartos(5, "insert into quartos values (null, 3, 'Executivo simples', 360);", db);
@@ -66,18 +74,21 @@ void gerar_dados(sqlite3 *db) {
     criar_quartos(15, "insert into quartos values (null, 5, 'Luxo duplo', 570);", db);
     criar_quartos(5, "insert into quartos values (null, 6, 'Luxo simples', 520);", db);
     criar_quartos(5, "insert into quartos values (null, 7, 'Presidencial', 1200);", db);
-    puts("QUARTOS OK");
+    puts("\n\t\tQUARTOS OK");
 
-    puts("REGISTRANDO SERVICOS!");
+    puts("\n\t\tREGISTRANDO SERVICOS!");
     // servicos basicos
     char *sql = "insert into servicos values (null, 'Babysitter hora', 45); "
                 "insert into servicos values (null, 'Diaria de automovel luxo', 100);"
                 "insert into servicos values (null, 'Diaria de automovel executivo', 60);"
                 "insert into servicos values (null, 'Tanque cheio', 300);"
                 "insert into servicos values (null, 'Carro assegurado', 250);";
-    puts("SERVICOS OK!");
-    executar_sql(sql, NULL, NULL);
 
+    sqlite3_exec(db, sql, NULL, NULL, &error_msg);
+    puts("\n\t\tSERVICOS OK!");
+
+    if (error_msg)
+        puts(error_msg);
 }
 
 int criar_tabelas() {
@@ -145,10 +156,10 @@ int criar_tabelas() {
     } else {
         created = 0;
     }
+    gerar_dados(db);
 
     sqlite3_close(db);
 
-    gerar_dados(db);
     return created;
 }
 
@@ -168,7 +179,7 @@ int
 db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *ids,
                    int (*callback)(void *, int, char **, char **)) {
 
-    char *sql = (char *) malloc(sizeof(char) * 500);
+    char sql[SQL_SIZE];
     char char_limit[5];
 
     strcpy(sql, "SELECT count(id) as 'qtd results', group_concat(id,',') as 'ids', group_concat(concat, "
@@ -217,8 +228,6 @@ db_listar_clientes(char *column, char *filter, int limit, char *order_by, void *
     strcat(sql, ");");
 
     int qtd_resultados = executar_sql(sql, callback, ids);
-
-    free(sql);
 
     return qtd_resultados;
 }
@@ -289,7 +298,10 @@ db_listar_reservas(char *column, char *filter, int limit, char *order_by, void *
 }
 
 int montar_qtd(void *ptr, int resultados, char **STR1, char **STR2) {
-    *((int *) ptr) = (int) strtol(STR1[0], NULL, 10);
+    if (resultados == 0 && (int) strtol(STR1[0], NULL, 10) == 0)
+        *((int *) ptr) = 0;
+    else
+        *((int *) ptr) = (int) strtol(STR1[0], NULL, 10);
     return 0;
 }
 
@@ -303,16 +315,15 @@ int get_qtd_clientes() {
 
 int get_qtd_reservas() {
     int total;
-    char *sql = (char *) malloc(sizeof(char) * 150);
+    char sql[SQL_SIZE];
     strcpy(sql, "select count(id) from reservas;");
     executar_sql(sql, montar_qtd, &total);
-    free(sql);
 
     return total;
 }
 
 int db_remover_dado(char *table, char *column, char *filter) {
-    char *sql = (char *) malloc(sizeof(char) * 150);
+    char sql[SQL_SIZE];
 
     strcpy(sql, "delete from ");
     strcat(sql, table);
@@ -332,41 +343,30 @@ int db_remover_dado(char *table, char *column, char *filter) {
     strcat(sql, ";");
     executar_sql(sql, mostrar_resultados, NULL);
 
-    free(sql);
-
     return 0;
 }
 
 int db_remover_reserva(char *id) {
-    char *sql = (char *) malloc(sizeof(char) * 150);
+    char sql[SQL_SIZE];
 
-    strcpy(sql, "insert into reservas_inativas select * from reservas where id = ");
-    strcat(sql, id);
-    strcat(sql, " ;");
-    executar_sql(sql, NULL, NULL);
+    snprintf(sql, SQL_SIZE, "insert into reservas_inativas select * from reservas where id = %s;", id);
+    int q1 = executar_sql(sql, NULL, NULL);
 
-    strcpy(sql, "delete from reservas where id = ");
-    strcat(sql, id);
-    strcat(sql, " ;");
-    executar_sql(sql, NULL, NULL);
+    snprintf(sql, SQL_SIZE, "delete from reservas where id = %s;", id);
+    int q2 = executar_sql(sql, NULL, NULL);
 
-    strcpy(sql, "delete from quartos_reservados where id_reserva = ");
-    strcat(sql, id);
-    strcat(sql, " ;");
-    executar_sql(sql, NULL, NULL);
+    snprintf(sql, SQL_SIZE, "delete from quartos_reservados where id_reserva = %s;", id);
+    int q3 = executar_sql(sql, NULL, NULL);
 
-    strcpy(sql, "update clientes set id_reserva = 0, id_quarto = 0 where id_reserva = ");
-    strcat(sql, id);
-    strcat(sql, " ;");
-    executar_sql(sql, NULL, NULL);
+    snprintf(sql, SQL_SIZE, "update clientes set id_reserva = 0, id_quarto = 0 where id_reserva = %s", id);
+    int q4 = executar_sql(sql, NULL, NULL);
 
-    free(sql);
-
-    return 0;
+    int q = q1 != -1 && q2 != -1 && q3 != -1 && q4 != -1;
+    return q ? 0 : -1;
 }
 
 int reservar_quarto(int id_quarto, int id_reserva) {
-    char *sql = (char *) malloc(sizeof(char) * 200);
+    char sql[SQL_SIZE];
     char str[100];
 
     strcpy(sql, "insert into quartos_reservados (id_quarto, id_reserva) values(");
@@ -377,21 +377,17 @@ int reservar_quarto(int id_quarto, int id_reserva) {
     strcat(sql, str);
     strcat(sql, ");");
 
-    executar_sql(sql, NULL, NULL);
-    free(sql);
-
-    return 0;
+    return executar_sql(sql, NULL, NULL);
 }
 
 int gerar_id(char *tabela, int *id) {
-    char *sql = (char *) malloc(sizeof(char) * 150);
+    char sql[SQL_SIZE];
 
-    strcpy(sql, "SELECT seq FROM SQLITE_SEQUENCE WHERE name LIKE '");
+    strcpy(sql, "SELECT seq FROM SQLITE_SEQUENCE WHERE name = '");
     strcat(sql, tabela);
     strcat(sql, "';");
 
     executar_sql(sql, montar_qtd, id);
-    free(sql);
 
     return ++(*id);
 }
@@ -493,7 +489,7 @@ void db_listar_dados_registrados() {
 void db_listar_clientes_detalhado() {
     char sql[500];
     strcpy(sql,
-           "SELECT group_concat(concat, '\t\t-----------------------------------------------\n\t\t') as result "
+           "SELECT group_concat(concat, '\n\t\t-----------------------------------------------\n\t\t') as result "
            "FROM (SELECT 'ID CLIENTE: ' || c.id || '\n\t\t' || 'NOME: ' || c.nome || ' ' || c.sobrenome || '\n\t\t' || 'QUARTO: ' || r.id_quarto ||"
            "'\n\t\t' || 'CPF: ' || c.cpf || '\n\t\t' || 'PHONE: ' || c.phone || "
            "r.id_quarto || '\n\t\t' || 'PERIODO DA RESERVA: ' || r.inicio || ' - ' || r.fim as concat FROM clientes c JOIN reservas r on c.id_reserva = r.id);");
@@ -504,7 +500,7 @@ void db_listar_clientes_detalhado() {
 void db_listar_quartos_detalhado() {
     char sql[500];
     strcpy(sql,
-           "SELECT group_concat(concat, '\t\t-----------------------------------------------\n\t\t') as result "
+           "SELECT group_concat(concat, '\n\t\t-----------------------------------------------\n\t\t') as result "
            "FROM (SELECT 'NUM QUARTO: ' || q.id_quarto || '\n\t\t' || 'ID CLIENTE: ' || r.id_cliente || '\n\t\t' || 'PERIODO DA RESERVA: ' || r.inicio || ' - ' || r.fim as concat "
            "FROM quartos_reservados q JOIN reservas r on r.id_quarto = q.id_quarto);");
     executar_sql(sql, db_exibir_resultados, NULL);
@@ -573,14 +569,11 @@ int db_montar_dados_login(char *login, char *senha) {
 }
 
 int db_alterar_dados_login(char *login, char *senha) {
-    char sql[200];
+    char sql[SQL_SIZE];
+    snprintf(sql, SQL_SIZE, "UPDATE logins SET login = '%s', senha = '%s' WHERE id = 1;", login, senha);
     strcpy(sql, "update logins set login = '");
-    strcat(sql, login);
-    strcat(sql, "', senha = '");
-    strcat(sql, senha);
-    strcat(sql, "' where id = 1;");
-    executar_sql(sql, NULL, NULL);
-    return 0;
+
+    return executar_sql(sql, NULL, NULL);
 }
 
 int extrair_login(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna) {

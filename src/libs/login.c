@@ -7,7 +7,6 @@
 #include "database.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 int autenticar() {
@@ -16,9 +15,9 @@ int autenticar() {
     if (existe_usuario_cadastrado() == 0) {
         criar_login(&login);
     }
-    
-    limpar_tela();
-    printf("\n\t\tINSIRA O LOGIN E SENHA\n\n");
+
+    mostrar_titulo();
+    printf("\n\t\tINSIRA O LOGIN E SENHA\n");
     tela_pegar_login(&login);
 
     int status = validar_login(&login);
@@ -30,6 +29,7 @@ int criar_login(LOGIN *login) {
 
     char senha_confirmacao[21];
 
+    mostrar_titulo();
     printf("\n\n\n\tCADASTRAR ADMIN: ");
     tela_pegar_login(login);
 

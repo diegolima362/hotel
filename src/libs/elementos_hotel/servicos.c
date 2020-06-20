@@ -351,8 +351,8 @@ void remover_servico_id(int id) {
 
 void criar_pedido() {
     int id_reserva;
-    int id_servico;
-    int id_pedido;
+    int id_servico = 0;
+    int id_pedido = 0;
     int op;
     int qtd;
 

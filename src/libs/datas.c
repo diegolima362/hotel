@@ -144,10 +144,10 @@ void mostrar_data_hora() {
 void inserir_data_reserva(struct tm *data_inicio, struct tm *data_final) {
     do {
         printf("\n\n\t\tDATA DE ENTRADA (EX.: DD-MM-AAAA): ");
-        scanf(" %d %d %d", &data_inicio->tm_mday, &data_inicio->tm_mon, &data_inicio->tm_year);
+        scanf(" %d-%d-%d", &data_inicio->tm_mday, &data_inicio->tm_mon, &data_inicio->tm_year);
 
         printf("\n\t\tDATA DE SAIDA (EX.: DD-MM-AAAA): ");
-        scanf(" %d %d %d", &data_final->tm_mday, &data_final->tm_mon, &data_final->tm_year);
+        scanf(" %d-%d-%d", &data_final->tm_mday, &data_final->tm_mon, &data_final->tm_year);
 
         if (validar_periodo(data_inicio, data_final) == 0) {
             printf("\n\n\t\tDATA OU PERIODO INVALIDO\n");

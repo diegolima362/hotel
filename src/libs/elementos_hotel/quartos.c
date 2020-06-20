@@ -124,29 +124,15 @@ void checar_quarto_disponivel() {
 }
 
 void formatar_quartos_disponiveis(char *sql, char *tipo, char *inicio, char *fim) {
-    strcpy(sql,
-           "SELECT count(id), group_concat(id, ','), 'TIPO: ' || descricao, 'VALOR: ' || valor, 'QUARTOS: \n\t\t[ ' || group_concat(id, ' ][ ') || ' ]'");
-    strcat(sql, "FROM (SELECT q.id, q.valor, q.descricao FROM quartos q ");
+    const char *select_1 = "SELECT count(id), group_concat(id, ','), 'TIPO: ' || descricao, 'VALOR: ' || valor, 'QUARTOS: \n\t\t[ ' || group_concat(id, ' ][ ') || ' ]' FROM (SELECT q.id, q.valor, q.descricao FROM quartos q WHERE";
+    const char *select_2 = "q.id NOT IN (SELECT qr.id_quarto FROM quartos_reservados qr JOIN reservas r ON r.id_quarto = qr.id JOIN quartos q ON qr.id_quarto = q.id AND";
+    char filter[64];
+    char date[64];
 
-    if (tipo != NULL) {
-        strcat(sql, " WHERE q.tipo = ");
-        strcat(sql, tipo);
-        strcat(sql, " AND ");
-    }
-    strcat(sql, "q.id NOT IN (SELECT r.id_quarto FROM reservas r JOIN quartos_reservados qr ON r.id_quarto = qr.id ");
-    strcat(sql, "WHERE (inicio <= '");
-    strcat(sql, inicio);
-    strcat(sql, "' AND fim >= '");
-    strcat(sql, inicio);
-    strcat(sql, "') OR (inicio < '");
-    strcat(sql, fim);
-    strcat(sql, "' AND fim >= '");
-    strcat(sql, fim);
-    strcat(sql, "') OR ('");
-    strcat(sql, inicio);
-    strcat(sql, "' <= inicio AND '");
-    strcat(sql, fim);
-    strcat(sql, "' >= inicio)));");
+    snprintf(filter, 50, "%s %s %s", tipo == NULL ? " " : "q.tipo = ", tipo, "AND");
+    snprintf(date, 50, "%s'%s' %s'%s' %s", "(inicio>=", inicio, "AND fim<=", fim, ")));");
+
+    snprintf(sql, SQL_SIZE, "%s %s %s %s", select_1, filter, select_2, date);
 }
 
 int mostrar_quartos_disponiveis(struct tm *data_inicio, struct tm *data_final, int tipo, int *ids) {
@@ -225,12 +211,12 @@ int selecionar_tipo_quarto() {
     do {
         mostrar_titulo();
         printf("\n\t\tSELECIONAR QUARTO\n");
-        printf("\n\t\t(1) EXECUTIVO TRIPLO\n");
+        printf("\n\t\t(1) EXECUTIVO TRIPLO");
         printf("\n\t\t (2) EXECUTIVO DUPLO");
-        printf("\n\t\t  (3) EXECUTIVO SIMPLES");
-        printf("\n\t\t   (4) LUXO TRIPLO\n");
+        printf("\n\t\t  (3) EXECUTIVO SIMPLES\n");
+        printf("\n\t\t   (4) LUXO TRIPLO");
         printf("\n\t\t    (5) LUXO DUPLO");
-        printf("\n\t\t     (6) LUXO SIMPLES");
+        printf("\n\t\t     (6) LUXO SIMPLES\n");
         printf("\n\t\t      (7) PRESIDENCIAL\n");
         printf("\n\t\t(0) VOLTAR\n");
         printf("\n\t\tOPCAO: ");

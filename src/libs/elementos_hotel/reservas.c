@@ -16,7 +16,9 @@
 
 #define LIMIT_BUSCA 1000
 
-void registrar_reserva();
+#define SQL_SIZE 512
+
+void criar_reserva();
 
 void exibir_menu_editar_reserva();
 
@@ -46,7 +48,7 @@ int pegar_cliente_reserva(RESERVA *r);
 
 int pegar_quarto_reserva(RESERVA *r);
 
-void alocar_cliente_reserva(int cliente, int reserva, int quarto);
+int alocar_cliente_reserva(int cliente, int reserva, int quarto);
 
 int testar_reserva_ativa(int cliente);
 
@@ -54,6 +56,8 @@ void montar_reserva_busca(int id, RESERVA *reserva);
 
 int montar_reserva_sql(void *ptr, int qtd_colunas, char **valor_na_coluna, char **nome_da_coluna);
 
+
+int gravar_reserva(RESERVA *r);
 
 void exibir_menu_gerenciar_reservas() {
     int opcao;
@@ -72,7 +76,7 @@ void exibir_menu_gerenciar_reservas() {
 
         switch (opcao) {
             case 1:
-                registrar_reserva();
+                criar_reserva();
                 break;
             case 2:
                 exibir_menu_editar_reserva();
@@ -137,11 +141,15 @@ int selecionar_reserva() {
     } while (opcao != 0);
 }
 
-void registrar_reserva() {
-    char sql[500];
+void criar_reserva() {
     int op;
     int ok = 0;
     RESERVA r;
+
+    r.id = 0;
+    r.id_quarto = 0;
+    r.id_cliente = 0;
+
     gerar_id("reservas", &r.id);
 
     while (1) {
@@ -160,8 +168,6 @@ void registrar_reserva() {
         if (ok) break;
     }
 
-    formatar_insert_reserva(&r, sql);
-
     while (1) {
         mostrar_titulo();
 
@@ -176,37 +182,43 @@ void registrar_reserva() {
         scanf(" %d", &op);
 
         if (op == 1) {
-            executar_sql(sql, NULL, NULL);
-            reservar_quarto(r.id_quarto, r.id);
-            alocar_cliente_reserva(r.id_cliente, r.id, r.id_quarto);
+            mostrar_titulo();
+            if (gravar_reserva(&r) != -1)
+                printf("\n\n\t\tRESERVA REGISTRADA!\n");
+            else
+                printf("\n\n\t\tFALHA AO REGISTRAR RESERVA!\n");
+            pausa();
             return;
         } else if (op == 2) {
             editar_dados_reserva(&r);
         } else if (op == 3) {
-            registrar_reserva();
-
+            criar_reserva();
             return;
         } else return;
     }
 }
 
-void alocar_cliente_reserva(int cliente, int reserva, int quarto) {
-    char sql[200];
-    char str[10];
+int gravar_reserva(RESERVA *r) {
+    char sql[SQL_SIZE];
 
-    strcpy(sql, "update clientes set id_reserva = ");
-    snprintf(str, 10, "%d", reserva);
-    strcat(sql, str);
+    formatar_insert_reserva(r, sql);
 
-    strcat(sql, ", id_quarto = ");
-    snprintf(str, 10, "%d", quarto);
-    strcat(sql, str);
+    int q1 = executar_sql(sql, NULL, NULL);
+    int q2 = reservar_quarto(r->id_quarto, r->id);
+    int q3 = alocar_cliente_reserva(r->id_cliente, r->id, r->id_quarto);
 
-    strcat(sql, " where id = ");
-    snprintf(str, 10, "%d", cliente);
-    strcat(sql, str);
-    strcat(sql, ";");
-    executar_sql(sql, NULL, NULL);
+    int q = q1 != -1 && q2 != -1 && q3 != -1;
+
+    return q ? 0 : -1;
+}
+
+int alocar_cliente_reserva(int cliente, int reserva, int quarto) {
+    char sql[SQL_SIZE];
+
+    snprintf(sql, SQL_SIZE, "UPDATE clientes SET id_reserva = %d, id_quarto = %d WHERE id = %d;", reserva, quarto,
+             cliente);
+
+    return executar_sql(sql, NULL, NULL);
 }
 
 void exibir_menu_editar_reserva() {
@@ -524,7 +536,7 @@ void editar_dados_reserva(RESERVA *r) {
     printf("\n\n\t\t(1) CONFIRMAR  (2) REINICIAR EDICAO  (0) CANCELAR\n\t\tOPCAO: ");
     scanf(" %d", &op);
 
-    char sql[500];
+    char sql[SQL_SIZE];
 
     if (op == 1) {
         formatar_update_reservas(r, sql);
@@ -540,53 +552,27 @@ void editar_dados_reserva(RESERVA *r) {
 }
 
 char *formatar_insert_reserva(RESERVA *r, char *sql) {
-    char str[50];
+    char inicio[50];
+    char fim[50];
+    char *insert = "INSERT INTO reservas VALUES";
 
-    strcpy(sql, "insert into reservas values (null, '");
+    formatar_data_sql(&r->inicio, inicio);
+    formatar_data_sql(&r->fim, fim);
 
-    snprintf(str, 10, "%d", r->id_cliente);
-    strcat(sql, str);
-    strcat(sql, "', '");
-
-    snprintf(str, 10, "%d", r->id_quarto);
-    strcat(sql, str);
-    strcat(sql, "', '");
-
-    formatar_data_sql(&r->inicio, str);
-    strcat(sql, str);
-    strcat(sql, "', '");
-
-    formatar_data_sql(&r->fim, str);
-    strcat(sql, str);
-    strcat(sql, "');");
-
+    snprintf(sql, SQL_SIZE, "%s (null, %d, %d, '%s', '%s');", insert, r->id_cliente, r->id_quarto, inicio, fim);
     return sql;
 }
 
 void formatar_update_reservas(RESERVA *r, char *sql) {
-    char str[50];
+    char inicio[50];
+    char fim[50];
 
-    strcpy(sql, "update reservas set id_cliente = '");
-    snprintf(str, 10, "%d", r->id_cliente);
-    strcat(sql, str);
+    formatar_data_sql(&r->inicio, inicio);
+    formatar_data_sql(&r->fim, fim);
 
-    strcat(sql, "', id_quarto = '");
-    snprintf(str, 10, "%d", r->id_quarto);
-    strcat(sql, str);
-
-    strcat(sql, "', inicio = '");
-    formatar_data_sql(&r->inicio, str);
-    strcat(sql, str);
-
-    strcat(sql, "', fim = '");
-    formatar_data_sql(&r->fim, str);
-    strcat(sql, str);
-
-    strcat(sql, "' where id = ");
-    snprintf(str, 10, "%d", r->id);
-    strcat(sql, str);
-    strcat(sql, ";");
-
+    snprintf(sql, SQL_SIZE,
+             "UPDATE reservas SET id_cliente = %d, id_quarto = %d, inicio = '%s', fim = '%s' WHERE id = %d;",
+             r->id_cliente, r->id_quarto, inicio, fim, r->id);
 }
 
 int pegar_data_reserva(RESERVA *r) {
@@ -727,7 +713,7 @@ int pegar_cliente_reserva(RESERVA *r) {
             }
             case 2: {
                 r->id_cliente = registrar_cliente();
-                return r->id_cliente;
+                return r->id_cliente == -1 ? 0 : r->id_cliente;
             }
             case 0: {
                 return 0;
@@ -743,14 +729,11 @@ int pegar_cliente_reserva(RESERVA *r) {
 }
 
 int testar_reserva_ativa(int cliente) {
-    char sql[200];
+    char sql[SQL_SIZE];
     char str[10];
     int reserva;
 
-    strcpy(sql, "select id_reserva from clientes where id = ");
-    snprintf(str, 10, "%d", cliente);
-    strcat(sql, str);
-    strcat(sql, ";");
+    snprintf(sql, SQL_SIZE, "SELECT id_reserva FROM clientes WHERE id = %d;", cliente);
 
     executar_sql(sql, montar_qtd, &reserva);
 
